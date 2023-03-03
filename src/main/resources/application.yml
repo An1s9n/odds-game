@@ -8,3 +8,7 @@ app:
   player:
     registration:
       debit-cents: 100000
+  game:
+    range:
+      left-inclusive: 1
+      right-inclusive: 10
