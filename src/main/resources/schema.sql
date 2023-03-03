@@ -14,3 +14,13 @@ create table transaction(
   amount_cents bigint not null,
   type text not null
 );
+
+create table bet(
+  id uuid default random_uuid() primary key,
+  player_id uuid references player not null,
+  timestamp_utc timestamp not null,
+  bet_number int not null,
+  bet_cents bigint not null,
+  prize_number int not null,
+  prize_cents bigint not null
+);
