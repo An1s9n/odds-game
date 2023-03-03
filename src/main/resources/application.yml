@@ -6,4 +6,5 @@ app:
   jwt:
     secret: "supa-dupa-mega-hyper-awesome-unbelievably-strong-secret"
   player:
-    initial-balance-cents: 100000
+    registration:
+      debit-cents: 100000

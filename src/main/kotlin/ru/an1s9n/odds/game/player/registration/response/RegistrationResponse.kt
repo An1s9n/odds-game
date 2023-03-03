@@ -1,4 +1,4 @@
-package ru.an1s9n.odds.game.player.model.response
+package ru.an1s9n.odds.game.player.registration.response
 
 import ru.an1s9n.odds.game.player.model.Player
 

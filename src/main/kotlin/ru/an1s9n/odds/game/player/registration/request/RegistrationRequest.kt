@@ -1,4 +1,4 @@
-package ru.an1s9n.odds.game.player.model.request
+package ru.an1s9n.odds.game.player.registration.request
 
 data class RegistrationRequest(
   val username: String,

@@ -15,7 +15,7 @@ data class Player(
 
   val lastName: String,
 
-  var balanceCents: Long,
+  var walletCents: Long,
 
   @Version
   var version: Long? = null,
