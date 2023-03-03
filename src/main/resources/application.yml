@@ -1,3 +1,9 @@
+spring:
+  webflux:
+    base-path: "/api/v1"
+
 app:
   jwt:
     secret: "supa-dupa-mega-hyper-awesome-unbelievably-strong-secret"
+  player:
+    initial-balance-cents: 100000
