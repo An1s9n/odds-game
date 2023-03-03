@@ -1,0 +1,3 @@
+app:
+  jwt:
+    secret: "supa-dupa-mega-hyper-awesome-unbelievably-strong-secret"
