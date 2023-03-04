@@ -1,4 +1,4 @@
-package ru.an1s9n.odds.game.player.exception
+package ru.an1s9n.odds.game.player.registration.exception
 
 class UsernameAlreadyTakenException(
   username: String,

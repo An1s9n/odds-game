@@ -5,10 +5,8 @@ spring:
 app:
   jwt:
     secret: "supa-dupa-mega-hyper-awesome-unbelievably-strong-secret"
-  player:
-    registration:
-      debit-cents: 100000
   game:
+    registration-credits: 1000
     range:
       left-inclusive: 1
       right-inclusive: 10

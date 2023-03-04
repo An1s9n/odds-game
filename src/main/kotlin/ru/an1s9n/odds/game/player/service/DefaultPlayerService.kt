@@ -2,7 +2,7 @@ package ru.an1s9n.odds.game.player.service
 
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.stereotype.Service
-import ru.an1s9n.odds.game.player.exception.UsernameAlreadyTakenException
+import ru.an1s9n.odds.game.player.registration.exception.UsernameAlreadyTakenException
 import ru.an1s9n.odds.game.player.model.Player
 import ru.an1s9n.odds.game.player.repository.PlayerRepository
 import java.util.UUID

@@ -2,15 +2,15 @@ package ru.an1s9n.odds.game.game.random
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
 import org.springframework.test.context.TestConstructor
 import org.springframework.test.context.TestPropertySource
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig
-import ru.an1s9n.odds.game.config.properties.GameRangeProperties
+import ru.an1s9n.odds.game.config.properties.GameProperties
 import kotlin.test.assertTrue
 
-@SpringJUnitConfig
+@SpringBootTest
 @TestPropertySource(properties = ["app.game.range.left-inclusive=2", "app.game.range.right-inclusive=7"])
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 internal class DefaultRandomServiceTest(
@@ -26,7 +26,7 @@ internal class DefaultRandomServiceTest(
   }
 
   @Configuration
-  @EnableConfigurationProperties(GameRangeProperties::class)
+  @EnableConfigurationProperties(GameProperties::class)
   @ComponentScan(basePackageClasses = [RandomService::class])
   internal class DefaultRandomServiceTestConfig
 }

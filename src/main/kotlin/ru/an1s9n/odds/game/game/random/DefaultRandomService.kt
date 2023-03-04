@@ -1,14 +1,14 @@
 package ru.an1s9n.odds.game.game.random
 
 import org.springframework.stereotype.Service
-import ru.an1s9n.odds.game.config.properties.GameRangeProperties
+import ru.an1s9n.odds.game.config.properties.GameProperties
 
 @Service
 class DefaultRandomService(
-  gameRangeProperties: GameRangeProperties,
+  gameProperties: GameProperties,
 ) : RandomService {
 
-  private val gameRange: IntRange = with(gameRangeProperties) { leftInclusive..rightInclusive }
+  private val gameRange: IntRange = with(gameProperties.range) { leftInclusive..rightInclusive }
 
   override fun generatePrizeNumber(): Int = gameRange.random()
 }

@@ -1,8 +1,8 @@
 package ru.an1s9n.odds.game.player.registration.service
 
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import ru.an1s9n.odds.game.config.properties.GameProperties
 import ru.an1s9n.odds.game.jwt.JwtService
 import ru.an1s9n.odds.game.player.model.Player
 import ru.an1s9n.odds.game.player.registration.request.RegistrationRequest
@@ -16,11 +16,13 @@ import ru.an1s9n.odds.game.web.exception.InvalidRequestException
 
 @Service
 class DefaultRegistrationService(
+  gameProperties: GameProperties,
   private val playerService: PlayerService,
   private val transactionService: TransactionService,
   private val jwtService: JwtService,
-  @Value("\${app.player.registration.debit-cents}") private val registrationDebitCents: Long,
 ) : RegistrationService {
+
+  private val registrationCents = gameProperties.registrationCredits * 100
 
   @Transactional
   override suspend fun register(registrationRequest: RegistrationRequest): RegistrationResponse {
@@ -35,14 +37,14 @@ class DefaultRegistrationService(
         username = registrationRequest.username.trim(),
         firstName = registrationRequest.firstName.trim(),
         lastName = registrationRequest.lastName.trim(),
-        walletCents = registrationDebitCents,
+        walletCents = registrationCents,
       )
     )
     transactionService.add(
       Transaction(
         playerId = player.id!!,
         timestampUtc = nowUtc(),
-        amountCents = registrationDebitCents,
+        amountCents = registrationCents,
         type = TransactionType.REGISTRATION,
       )
     )
