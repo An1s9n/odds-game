@@ -11,6 +11,8 @@ data class GameProperties(
   val registrationCredits: Long,
 
   val range: GameRange,
+
+  val offsetToPrizeFun: Map<Int, String>,
 ) {
 
   private val log = LoggerFactory.getLogger(this.javaClass)

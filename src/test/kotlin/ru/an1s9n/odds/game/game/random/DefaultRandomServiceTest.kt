@@ -11,16 +11,19 @@ import ru.an1s9n.odds.game.config.properties.GameProperties
 import kotlin.test.assertTrue
 
 @SpringBootTest
-@TestPropertySource(properties = ["app.game.range.left-inclusive=2", "app.game.range.right-inclusive=7"])
+@TestPropertySource(properties = [
+  "app.game.range.left-inclusive=2",
+  "app.game.range.right-inclusive=7",
+])
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 internal class DefaultRandomServiceTest(
-  private val randomService: RandomService,
+  private val defaultRandomService: DefaultRandomService,
 ) {
 
   @Test
   internal fun `ensure generated prize number does not fall out of property-set range bounds`() {
     repeat(1_000) {
-      val random = randomService.generatePrizeNumber()
+      val random = defaultRandomService.generatePrizeNumber()
       assertTrue(random in 2..7)
     }
   }

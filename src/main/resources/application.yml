@@ -10,3 +10,7 @@ app:
     range:
       left-inclusive: 1
       right-inclusive: 10
+    offset-to-prize-fun:
+      0: "*10"
+      1: "*5"
+      2: "/2"
