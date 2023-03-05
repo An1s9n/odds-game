@@ -25,12 +25,8 @@ class DefaultRegistrationService(
   private val registrationCents = gameProperties.registrationCredits * 100
 
   @Transactional
-  override suspend fun register(registrationRequest: RegistrationRequest): RegistrationResponse {
-    validate(registrationRequest).let { violations ->
-      if (violations.isNotEmpty()) {
-        throw InvalidRequestException(violations)
-      }
-    }
+  override suspend fun validateRequestAndRegister(registrationRequest: RegistrationRequest): RegistrationResponse {
+    validate(registrationRequest)?.let { violations -> throw InvalidRequestException(violations) }
 
     val player = playerService.add(
       Player(
@@ -49,13 +45,19 @@ class DefaultRegistrationService(
       )
     )
 
-    return RegistrationResponse(player, jwtService.createTokenWith(player.id!!))
+    return RegistrationResponse(player, jwtService.createTokenWith(player.id))
   }
 
-  private fun validate(registrationRequest: RegistrationRequest): List<String> =
+  private fun validate(registrationRequest: RegistrationRequest): List<String>? =
     buildList {
-      if (registrationRequest.username.isBlank()) add("username can not be blank")
-      if (registrationRequest.firstName.isBlank()) add("firstName can not be blank")
-      if (registrationRequest.lastName.isBlank()) add("lastName can not be blank")
-    }
+      if (registrationRequest.username.isBlank()) {
+        add("username can not be blank")
+      }
+      if (registrationRequest.firstName.isBlank()) {
+        add("firstName can not be blank")
+      }
+      if (registrationRequest.lastName.isBlank()) {
+        add("lastName can not be blank")
+      }
+    }.ifEmpty { null }
 }

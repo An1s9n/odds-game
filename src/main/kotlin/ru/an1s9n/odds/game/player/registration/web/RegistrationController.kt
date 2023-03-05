@@ -20,7 +20,7 @@ class RegistrationController(
 
   @PostMapping("/register")
   suspend fun register(@RequestBody registrationRequest: RegistrationRequest): RegistrationResponse =
-    registrationService.register(registrationRequest)
+    registrationService.validateRequestAndRegister(registrationRequest)
 
   @ExceptionHandler
   suspend fun handleUsernameAlreadyTaken(e: UsernameAlreadyTakenException): ProblemDetail =

@@ -5,5 +5,5 @@ import ru.an1s9n.odds.game.player.registration.response.RegistrationResponse
 
 interface RegistrationService {
 
-  suspend fun register(registrationRequest: RegistrationRequest): RegistrationResponse
+  suspend fun validateRequestAndRegister(registrationRequest: RegistrationRequest): RegistrationResponse
 }

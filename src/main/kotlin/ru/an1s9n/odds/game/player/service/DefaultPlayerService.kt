@@ -20,4 +20,7 @@ class DefaultPlayerService(
     } catch (e: DuplicateKeyException) {
       throw UsernameAlreadyTakenException(player.username)
     }
+
+  override suspend fun addToWallet(player: Player, addCents: Long): Player =
+    playerRepository.save(player.apply { walletCents += addCents })
 }

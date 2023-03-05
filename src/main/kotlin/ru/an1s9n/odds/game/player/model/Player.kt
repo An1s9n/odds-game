@@ -1,5 +1,6 @@
 package ru.an1s9n.odds.game.player.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Version
 import java.util.UUID
@@ -18,5 +19,6 @@ data class Player(
   var walletCents: Long,
 
   @Version
+  @JsonIgnore
   var version: Long? = null,
 )

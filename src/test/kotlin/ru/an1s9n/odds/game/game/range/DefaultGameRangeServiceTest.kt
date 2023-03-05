@@ -37,5 +37,5 @@ internal class DefaultGameRangeServiceTest(
   @Configuration
   @EnableConfigurationProperties(GameProperties::class)
   @ComponentScan(basePackageClasses = [GameRangeService::class])
-  internal class DefaultRandomServiceTestConfig
+  internal class DefaultGameRangeServiceTestConfig
 }
