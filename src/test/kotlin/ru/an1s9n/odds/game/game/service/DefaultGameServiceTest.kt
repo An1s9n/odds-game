@@ -11,6 +11,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest
 import org.springframework.boot.test.context.TestConfiguration
@@ -29,6 +30,7 @@ import ru.an1s9n.odds.game.transaction.model.TransactionType
 import ru.an1s9n.odds.game.transaction.repository.TransactionRepository
 import ru.an1s9n.odds.game.transaction.service.TransactionService
 import ru.an1s9n.odds.game.util.sum
+import ru.an1s9n.odds.game.web.exception.InvalidRequestException
 import kotlin.test.assertEquals
 
 @DataR2dbcTest
@@ -91,6 +93,30 @@ internal class DefaultGameServiceTest(
         assertEquals(600, betCents)
         assertEquals(0, prizeCents)
       }
+    }
+  }
+
+  @Test
+  internal fun `test play when player has insufficient wallet, ensure InvalidRequestException thrown`() {
+    runBlocking {
+      val testPlayer = persistTestPlayer()
+
+      val e = assertThrows<InvalidRequestException> {
+        defaultGameService.validateRequestAndPlay(testPlayer, PlayRequest(betNumber = 130, betCredits = 6))
+      }
+      assertEquals("insufficient wallet: required 600 cents, on wallet 500 cents", e.message)
+    }
+  }
+
+  @Test
+  internal fun `test play when player bets on invalid number, ensure InvalidRequestException thrown`() {
+    runBlocking {
+      val testPlayer = persistTestPlayer()
+
+      val e = assertThrows<InvalidRequestException> {
+        defaultGameService.validateRequestAndPlay(testPlayer, PlayRequest(betNumber = 200, betCredits = 3))
+      }
+      assertEquals("betNumber 200 is out of 100..150 game range", e.message)
     }
   }
 
