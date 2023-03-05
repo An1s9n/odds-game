@@ -6,13 +6,11 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
 import org.springframework.test.context.TestConstructor
-import org.springframework.test.context.TestPropertySource
 import ru.an1s9n.odds.game.config.properties.GameProperties
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-@SpringBootTest
-@TestPropertySource(properties = [
+@SpringBootTest(properties = [
   "app.game.range.left-inclusive=2",
   "app.game.range.right-inclusive=7",
 ])
@@ -34,7 +32,7 @@ internal class DefaultGameRangeServiceTest(
     }
   }
 
-  @Configuration
+  @Configuration(proxyBeanMethods = false)
   @EnableConfigurationProperties(GameProperties::class)
   @ComponentScan(basePackageClasses = [GameRangeService::class])
   internal class DefaultGameRangeServiceTestConfig

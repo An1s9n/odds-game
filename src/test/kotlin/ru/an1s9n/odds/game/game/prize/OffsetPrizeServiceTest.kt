@@ -6,12 +6,10 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
 import org.springframework.test.context.TestConstructor
-import org.springframework.test.context.TestPropertySource
 import ru.an1s9n.odds.game.config.properties.GameProperties
 import kotlin.test.assertEquals
 
-@SpringBootTest
-@TestPropertySource(properties = [
+@SpringBootTest(properties = [
   "app.game.offset-to-prize-fun.0=*7",
   "app.game.offset-to-prize-fun.1=*3",
   "app.game.offset-to-prize-fun.2=*1",
@@ -38,7 +36,7 @@ internal class OffsetPrizeServiceTest(
     assertEquals(0, offsetPrizeService.definePrizeCents(5, 10, 100))
   }
 
-  @Configuration
+  @Configuration(proxyBeanMethods = false)
   @EnableConfigurationProperties(GameProperties::class)
   @ComponentScan(basePackageClasses = [PrizeService::class])
   internal class OffsetPrizeServiceTestConfig
