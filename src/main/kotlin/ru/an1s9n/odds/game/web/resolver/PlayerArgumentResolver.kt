@@ -30,7 +30,9 @@ class PlayerArgumentResolver(
     return Mono.defer {
       exchange.request.headers[HttpHeaders.AUTHORIZATION]?.firstOrNull()
         ?.let { token -> jwtService.validateAndExtractIdFrom(token) }
-        ?.let { id -> mono { playerService.getById(id) } }
+        ?.let { id -> mono { playerService.getById(id) }
+          .switchIfEmpty(Mono.error(UnauthenticatedException()))
+        }
         ?: Mono.error(UnauthenticatedException())
     }
   }
