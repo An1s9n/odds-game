@@ -21,3 +21,10 @@ data class GameProperties(
       log.info("initialized $PROPERTIES_PREFIX properties: $this")
   }
 }
+
+data class GameRange(
+
+  val leftInclusive: Int,
+
+  val rightInclusive: Int,
+)
