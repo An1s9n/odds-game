@@ -33,6 +33,9 @@ class DefaultGameService(
 
   private fun validate(walletCents: Long, betCents: Long, betNumber: Int): List<String>? =
     buildList {
+      if (betCents <= 0) {
+        add("bet must be positive")
+      }
       if (walletCents < betCents) {
         add("insufficient wallet: required $betCents cents, on wallet $walletCents cents")
       }

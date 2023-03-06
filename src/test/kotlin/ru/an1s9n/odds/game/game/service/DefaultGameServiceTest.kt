@@ -124,6 +124,18 @@ internal class DefaultGameServiceTest(
   }
 
   @Test
+  internal fun `test play when player bets with negative bet, ensure InvalidRequestException thrown`() {
+    runBlocking {
+      val testPlayer = persistTestPlayer()
+
+      val e = assertThrows<InvalidRequestException> {
+        spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequest(betNumber = 125, betCredits = -3))
+      }
+      assertEquals("bet must be positive", e.message)
+    }
+  }
+
+  @Test
   internal fun `test play when 2 games are concurrent, ensure retry is performed to handle optimistic locking exception`() {
     runBlocking {
       val testPlayer = persistTestPlayer()
