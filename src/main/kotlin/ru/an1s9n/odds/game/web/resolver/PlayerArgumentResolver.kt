@@ -1,6 +1,6 @@
-package ru.an1s9n.odds.game.web.argument.resolver
+package ru.an1s9n.odds.game.web.resolver
 
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.reactor.mono
 import org.springframework.core.MethodParameter
 import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Component
@@ -30,8 +30,7 @@ class PlayerArgumentResolver(
     return Mono.defer {
       exchange.request.headers[HttpHeaders.AUTHORIZATION]?.firstOrNull()
         ?.let { token -> jwtService.validateAndExtractIdFrom(token) }
-        ?.let { id -> runBlocking { playerService.getById(id) } }
-        ?.let { player -> Mono.just(player) }
+        ?.let { id -> mono { playerService.getById(id) } }
         ?: Mono.error(UnauthenticatedException())
     }
   }
