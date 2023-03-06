@@ -16,6 +16,8 @@ interface PlayerRepository: CoroutineCrudRepository<Player, UUID> {
         join bet b on p.id = b.player_id
     group by p.id
     order by sum_prize_cents desc
+    limit :limit
+    offset :offset
   """)
-  fun findTopByPrizeSum(pageable: Pageable): Flow<PlayerTopProjection>
+  fun findTopByPrizeSum(limit: Int, offset: Int): Flow<PlayerTopProjection>
 }
