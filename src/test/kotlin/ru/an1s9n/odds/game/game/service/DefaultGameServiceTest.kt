@@ -1,12 +1,15 @@
 package ru.an1s9n.odds.game.game.service
 
 import com.ninjasquad.springmockk.MockkBean
+import com.ninjasquad.springmockk.SpykBean
 import io.mockk.every
+import io.mockk.verify
 import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.reduce
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -36,7 +39,7 @@ import kotlin.test.assertEquals
 @DataR2dbcTest
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 internal class DefaultGameServiceTest(
-  private val defaultGameService: DefaultGameService,
+  @SpykBean private val spyDefaultGameService: DefaultGameService,
   private val transactionRepository: TransactionRepository,
   private val betRepository: BetRepository,
   private val playerRepository: PlayerRepository,
@@ -62,9 +65,9 @@ internal class DefaultGameServiceTest(
   internal fun `test play, ensure transactions and bets created and user wallet updated correctly`() {
     runBlocking {
       val testPlayer = persistTestPlayer()
-      defaultGameService.validateRequestAndPlay(testPlayer, PlayRequest(betNumber = 130, betCredits = 2))
-      defaultGameService.validateRequestAndPlay(testPlayer, PlayRequest(betNumber = 129, betCredits = 3))
-      defaultGameService.validateRequestAndPlay(testPlayer, PlayRequest(betNumber = 128, betCredits = 6))
+      spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequest(betNumber = 130, betCredits = 2))
+      spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequest(betNumber = 129, betCredits = 3))
+      spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequest(betNumber = 128, betCredits = 6))
 
       assertEquals(100, playerRepository.findAll().first().walletCents)
 
@@ -76,19 +79,19 @@ internal class DefaultGameServiceTest(
       val allBets = betRepository.findAll()
       assertEquals(3, allBets.count())
       with(allBets.first { it.betNumber == 130 }) {
-        assertEquals(testPlayer.id!!, playerId)
+        assertEquals(testPlayer.id, playerId)
         assertEquals(130, prizeNumber)
         assertEquals(200, betCents)
         assertEquals(400, prizeCents)
       }
       with(allBets.first { it.betNumber == 129 }) {
-        assertEquals(testPlayer.id!!, playerId)
+        assertEquals(testPlayer.id, playerId)
         assertEquals(130, prizeNumber)
         assertEquals(300, betCents)
         assertEquals(300, prizeCents)
       }
       with(allBets.first { it.betNumber == 128 }) {
-        assertEquals(testPlayer.id!!, playerId)
+        assertEquals(testPlayer.id, playerId)
         assertEquals(130, prizeNumber)
         assertEquals(600, betCents)
         assertEquals(0, prizeCents)
@@ -102,7 +105,7 @@ internal class DefaultGameServiceTest(
       val testPlayer = persistTestPlayer()
 
       val e = assertThrows<InvalidRequestException> {
-        defaultGameService.validateRequestAndPlay(testPlayer, PlayRequest(betNumber = 130, betCredits = 6))
+        spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequest(betNumber = 130, betCredits = 6))
       }
       assertEquals("insufficient wallet: required 600 cents, on wallet 500 cents", e.message)
     }
@@ -114,9 +117,83 @@ internal class DefaultGameServiceTest(
       val testPlayer = persistTestPlayer()
 
       val e = assertThrows<InvalidRequestException> {
-        defaultGameService.validateRequestAndPlay(testPlayer, PlayRequest(betNumber = 200, betCredits = 3))
+        spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequest(betNumber = 200, betCredits = 3))
       }
       assertEquals("betNumber 200 is out of 100..150 game range", e.message)
+    }
+  }
+
+  @Test
+  internal fun `test play when 2 games are concurrent, ensure retry is performed to handle optimistic locking exception`() {
+    runBlocking {
+      val testPlayer = persistTestPlayer()
+      val firstGame = launch {
+        spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequest(betNumber = 129, betCredits = 1))
+      }
+      val secondGame = launch {
+        spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequest(betNumber = 128, betCredits = 2))
+      }
+      listOf(firstGame, secondGame).forEach { it.join() }
+
+      assertEquals(300, playerRepository.findAll().first().walletCents)
+
+      val allTransactions = transactionRepository.findAll()
+      assertEquals(3, allTransactions.count())
+      assertEquals(-300, allTransactions.filter { it.type == TransactionType.BET }.map { it.amountCents }.reduce(sum))
+      assertEquals(100, allTransactions.filter { it.type == TransactionType.PRIZE }.map { it.amountCents }.reduce(sum))
+
+      val allBets = betRepository.findAll()
+      assertEquals(2, allBets.count())
+      with(allBets.first { it.betNumber == 129 }) {
+        assertEquals(testPlayer.id, playerId)
+        assertEquals(130, prizeNumber)
+        assertEquals(100, betCents)
+        assertEquals(100, prizeCents)
+      }
+      with(allBets.first { it.betNumber == 128 }) {
+        assertEquals(testPlayer.id, playerId)
+        assertEquals(130, prizeNumber)
+        assertEquals(200, betCents)
+        assertEquals(0, prizeCents)
+      }
+
+      verify(exactly = 3) { runBlocking { spyDefaultGameService.validateRequestAndPlay(any(), any()) } }
+    }
+  }
+
+  @Test
+  internal fun `test play when 2 games are concurrent and first game exhausts player's wallet, ensure second game is not allowed`() {
+    runBlocking {
+      val testPlayer = persistTestPlayer()
+      val firstGame = launch {
+        spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequest(betNumber = 128, betCredits = 5))
+      }
+      val secondGame = launch {
+        val e = assertThrows<InvalidRequestException> {
+          spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequest(betNumber = 130, betCredits = 1))
+        }
+        assertEquals("insufficient wallet: required 100 cents, on wallet 0 cents", e.message)
+      }
+      listOf(firstGame, secondGame).forEach { it.join() }
+
+      assertEquals(0, playerRepository.findAll().first().walletCents)
+
+      assertEquals(1, transactionRepository.count())
+      with(transactionRepository.findAll().first()) {
+        assertEquals(TransactionType.BET, type)
+        assertEquals(-500, amountCents)
+      }
+
+      assertEquals(1, betRepository.count())
+      with(betRepository.findAll().first()) {
+        assertEquals(testPlayer.id, playerId)
+        assertEquals(128, betNumber)
+        assertEquals(130, prizeNumber)
+        assertEquals(500, betCents)
+        assertEquals(0, prizeCents)
+      }
+
+      verify(exactly = 3) { runBlocking { spyDefaultGameService.validateRequestAndPlay(any(), any()) } }
     }
   }
 

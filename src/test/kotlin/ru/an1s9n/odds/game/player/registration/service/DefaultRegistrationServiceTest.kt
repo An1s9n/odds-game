@@ -33,7 +33,7 @@ internal class DefaultRegistrationServiceTest(
   private val defaultRegistrationService: DefaultRegistrationService,
   private val playerRepository: PlayerRepository,
   private val transactionRepository: TransactionRepository,
-  @SpykBean private val transactionService: TransactionService,
+  @SpykBean private val spyTransactionService: TransactionService,
   @MockkBean private val mockJwtService: JwtService,
 ) {
 
@@ -139,7 +139,7 @@ internal class DefaultRegistrationServiceTest(
 
   @Test
   internal fun `test player registration, ensure registration runs in transaction and player is not persisted when registration bonus accrual fails`() {
-    every { runBlocking { transactionService.add(any()) } } throws RuntimeException()
+    every { runBlocking { spyTransactionService.add(any()) } } throws RuntimeException()
 
     runBlocking {
       assertThrows<RuntimeException> {
