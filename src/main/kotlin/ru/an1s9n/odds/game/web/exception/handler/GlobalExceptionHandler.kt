@@ -1,5 +1,6 @@
 package ru.an1s9n.odds.game.web.exception.handler
 
+import jakarta.validation.ConstraintViolationException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -21,6 +22,13 @@ class GlobalExceptionHandler {
   fun handleUnauthenticated(e: UnauthenticatedException): ProblemDetail =
     ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED).apply {
       title = UnauthenticatedException::class.simpleName
+      detail = e.message
+    }
+
+  @ExceptionHandler
+  fun handleConstraintViolation(e: ConstraintViolationException): ProblemDetail =
+    ProblemDetail.forStatus(HttpStatus.BAD_REQUEST).apply {
+      title = ConstraintViolationException::class.simpleName
       detail = e.message
     }
 }
