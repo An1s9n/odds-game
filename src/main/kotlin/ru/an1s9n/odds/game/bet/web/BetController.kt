@@ -1,8 +1,8 @@
 package ru.an1s9n.odds.game.bet.web
 
-import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Positive
 import kotlinx.coroutines.flow.Flow
+import org.hibernate.validator.constraints.Range
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -23,6 +23,6 @@ class BetController(
   fun my(
     player: Player,
     @Positive @RequestParam(defaultValue = "1") page: Int,
-    @Positive @Max(100) @RequestParam(defaultValue = "20") perPage: Int,
+    @Range(min = 1, max = 100) @RequestParam(defaultValue = "20") perPage: Int,
   ): Flow<Bet> = betService.findAllByPlayerFreshFirst(player, page, perPage)
 }

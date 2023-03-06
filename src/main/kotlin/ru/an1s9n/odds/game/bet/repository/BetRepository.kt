@@ -8,5 +8,5 @@ import java.util.UUID
 
 interface BetRepository : CoroutineCrudRepository<Bet, UUID> {
 
-  fun findAllByPlayerIdOrderByTimestampUtcDesc(playerId: UUID, page: Pageable): Flow<Bet>
+  fun findAllByPlayerIdOrderByTimestampUtcDesc(playerId: UUID, pageable: Pageable): Flow<Bet>
 }

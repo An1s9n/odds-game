@@ -1,7 +1,21 @@
 package ru.an1s9n.odds.game.player.repository
 
+import kotlinx.coroutines.flow.Flow
+import org.springframework.data.domain.Pageable
+import org.springframework.data.r2dbc.repository.Query
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import ru.an1s9n.odds.game.player.model.Player
+import ru.an1s9n.odds.game.player.top.response.PlayerTopProjection
 import java.util.UUID
 
-interface PlayerRepository: CoroutineCrudRepository<Player, UUID>
+interface PlayerRepository: CoroutineCrudRepository<Player, UUID> {
+
+  @Query("""
+    select username, first_name, last_name, wallet_cents, sum(prize_cents) sum_prize_cents
+    from player p
+        join bet b on p.id = b.player_id
+    group by p.id
+    order by sum_prize_cents desc
+  """)
+  fun findTopByPrizeSum(pageable: Pageable): Flow<PlayerTopProjection>
+}

@@ -1,4 +1,4 @@
-package ru.an1s9n.odds.game.transaction.web
+package ru.an1s9n.odds.game.player.top.web
 
 import jakarta.validation.constraints.Positive
 import kotlinx.coroutines.flow.Flow
@@ -8,21 +8,19 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import ru.an1s9n.odds.game.player.model.Player
-import ru.an1s9n.odds.game.transaction.model.Transaction
-import ru.an1s9n.odds.game.transaction.service.TransactionService
+import ru.an1s9n.odds.game.player.service.PlayerService
+import ru.an1s9n.odds.game.player.top.response.PlayerTopProjection
 
 @RestController
-@RequestMapping("/transaction")
+@RequestMapping("/player/top")
 @Validated
-class TransactionController(
-  private val transactionService: TransactionService,
+class PlayerTopController(
+  private val playerService: PlayerService,
 ) {
 
-  @GetMapping("/my")
-  fun my(
-    player: Player,
+  @GetMapping
+  fun top(
     @Positive @RequestParam(defaultValue = "1") page: Int,
     @Range(min = 1, max = 100) @RequestParam(defaultValue = "20") perPage: Int,
-  ): Flow<Transaction> = transactionService.findAllByPlayerFreshFirst(player, page, perPage)
+  ): Flow<PlayerTopProjection> = playerService.getTopBySumPrize(page, perPage)
 }

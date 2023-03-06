@@ -13,12 +13,12 @@ import ru.an1s9n.odds.game.player.registration.response.RegistrationResponse
 import ru.an1s9n.odds.game.player.registration.service.RegistrationService
 
 @RestController
-@RequestMapping("/player")
-class RegistrationController(
+@RequestMapping("/player/register")
+class PlayerRegistrationController(
   private val registrationService: RegistrationService,
 ) {
 
-  @PostMapping("/register")
+  @PostMapping
   suspend fun register(@RequestBody registrationRequest: RegistrationRequest): RegistrationResponse =
     registrationService.validateRequestAndRegister(registrationRequest)
 
