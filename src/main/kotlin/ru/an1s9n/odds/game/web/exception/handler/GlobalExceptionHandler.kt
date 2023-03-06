@@ -11,24 +11,15 @@ import ru.an1s9n.odds.game.web.exception.UnauthenticatedException
 @RestControllerAdvice
 class GlobalExceptionHandler {
 
-  @ExceptionHandler
-  fun handleInvalidRequest(e: InvalidRequestException): ProblemDetail =
-    ProblemDetail.forStatus(HttpStatus.BAD_REQUEST).apply {
-      title = InvalidRequestException::class.simpleName
-      detail = e.message
-    }
+  @ExceptionHandler(InvalidRequestException::class, ConstraintViolationException::class)
+  fun handleBadRequest(e: Exception): ProblemDetail = problemDetailFor(e, HttpStatus.BAD_REQUEST)
 
   @ExceptionHandler
-  fun handleUnauthenticated(e: UnauthenticatedException): ProblemDetail =
-    ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED).apply {
-      title = UnauthenticatedException::class.simpleName
-      detail = e.message
-    }
+  fun handleUnauthenticated(e: UnauthenticatedException): ProblemDetail = problemDetailFor(e, HttpStatus.UNAUTHORIZED)
 
-  @ExceptionHandler
-  fun handleConstraintViolation(e: ConstraintViolationException): ProblemDetail =
-    ProblemDetail.forStatus(HttpStatus.BAD_REQUEST).apply {
-      title = ConstraintViolationException::class.simpleName
+  private fun problemDetailFor(e: Exception, status: HttpStatus): ProblemDetail =
+    ProblemDetail.forStatus(status).apply {
+      title = e::class.simpleName
       detail = e.message
     }
 }
