@@ -11,7 +11,7 @@
   <properties>
     <kotlin.version>1.7.22</kotlin.version>
     <kotlin.compiler.jvmTarget>17</kotlin.compiler.jvmTarget>
-    <spring.boot.versoion>3.0.2</spring.boot.versoion>
+    <spring.boot.versoion>3.0.4</spring.boot.versoion>
     <java.jwt.version>4.3.0</java.jwt.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
@@ -71,6 +71,11 @@
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>3.0.0-M7</version>
+      </plugin>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <version>${spring.boot.versoion}</version>
       </plugin>
     </plugins>
   </build>
@@ -168,6 +173,7 @@
       <groupId>com.ninja-squad</groupId>
       <artifactId>springmockk</artifactId>
       <version>4.0.0</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

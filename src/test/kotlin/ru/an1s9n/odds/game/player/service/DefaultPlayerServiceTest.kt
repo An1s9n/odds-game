@@ -66,7 +66,7 @@ internal class DefaultPlayerServiceTest(
   }
 
   @Test
-  internal fun `test add when user with such username exists, ensure UsernameAlreadyTakenException thrown`() {
+  internal fun `test add when player with such username exists, ensure UsernameAlreadyTakenException thrown`() {
     runBlocking {
       playerRepository.save(Player(username = "An1s9n", firstName = "Fedor", lastName = "Fedorov", walletCents = 0))
 

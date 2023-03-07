@@ -18,7 +18,7 @@ data class GameProperties(
   private val log = LoggerFactory.getLogger(this.javaClass)
 
   init {
-      log.info("initialized $PROPERTIES_PREFIX properties: $this")
+    log.info("initialized $PROPERTIES_PREFIX properties: $this")
   }
 }
 

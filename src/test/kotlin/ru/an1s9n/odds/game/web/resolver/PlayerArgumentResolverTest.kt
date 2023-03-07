@@ -64,7 +64,7 @@ internal class PlayerArgumentResolverTest(
   }
 
   @Test
-  internal fun `ensure 401 thrown in case of valid token but non-existent user`() {
+  internal fun `ensure 401 thrown in case of valid token but non-existent player`() {
     every { mockJwtService.validateAndExtractIdFrom("mock-token") } returns UUID.randomUUID()
     every { runBlocking { mockPlayerService.getById(any()) } } returns null
 
