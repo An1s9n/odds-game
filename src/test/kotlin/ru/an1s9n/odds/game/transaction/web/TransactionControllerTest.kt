@@ -23,7 +23,7 @@ import java.util.UUID
 internal class TransactionControllerTest(
   private val webTestClient: WebTestClient,
   @MockkBean private val mockPlayerArgumentResolver: PlayerArgumentResolver,
-  @MockkBean private val transactionService: TransactionService,
+  @MockkBean private val mockTransactionService: TransactionService,
 ) {
 
   private val testPlayer = Player(id = UUID.randomUUID(), username = "An1s9n", firstName = "Pavel", lastName = "Anisimov", walletCents = 700)
@@ -40,7 +40,7 @@ internal class TransactionControllerTest(
 
   @Test
   internal fun `ensure my endpoint works correctly`() {
-    every { transactionService.findAllByPlayerFreshFirst(eq(testPlayer), eq(1), eq(20)) } returns
+    every { mockTransactionService.findAllByPlayerFreshFirst(testPlayer, 1, 20) } returns
       flowOf(testTransaction1, testTransaction2)
 
     webTestClient.get()
@@ -53,7 +53,7 @@ internal class TransactionControllerTest(
 
   @Test
   internal fun `ensure my endpoint works correctly with user-specified pagination parameters`() {
-    every { transactionService.findAllByPlayerFreshFirst(eq(testPlayer), eq(3), eq(1)) } returns
+    every { mockTransactionService.findAllByPlayerFreshFirst(eq(testPlayer), eq(3), eq(1)) } returns
       flowOf(testTransaction2)
 
     webTestClient.get()

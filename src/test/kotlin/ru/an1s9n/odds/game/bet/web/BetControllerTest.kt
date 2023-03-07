@@ -22,7 +22,7 @@ import java.util.UUID
 internal class BetControllerTest(
   private val webTestClient: WebTestClient,
   @MockkBean private val mockPlayerArgumentResolver: PlayerArgumentResolver,
-  @MockkBean private val betService: BetService,
+  @MockkBean private val mockBetService: BetService,
 ) {
 
   private val testPlayer = Player(id = UUID.randomUUID(), username = "An1s9n", firstName = "Pavel", lastName = "Anisimov", walletCents = 700)
@@ -39,7 +39,7 @@ internal class BetControllerTest(
 
   @Test
   internal fun `ensure my endpoint works correctly`() {
-    every { betService.findAllByPlayerFreshFirst(eq(testPlayer), eq(1), eq(20)) } returns
+    every { mockBetService.findAllByPlayerFreshFirst(testPlayer, 1, 20) } returns
       flowOf(testBet1, testBet2)
 
     webTestClient.get()
@@ -52,7 +52,7 @@ internal class BetControllerTest(
 
   @Test
   internal fun `ensure my endpoint works correctly with user-specified pagination parameters`() {
-    every { betService.findAllByPlayerFreshFirst(eq(testPlayer), eq(3), eq(1)) } returns flowOf(testBet2)
+    every { mockBetService.findAllByPlayerFreshFirst(eq(testPlayer), eq(3), eq(1)) } returns flowOf(testBet2)
 
     webTestClient.get()
       .uri("/bet/my?page=3&perPage=1")
