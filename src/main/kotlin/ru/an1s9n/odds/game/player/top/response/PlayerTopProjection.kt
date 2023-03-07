@@ -1,12 +1,14 @@
 package ru.an1s9n.odds.game.player.top.response
 
+import io.swagger.v3.oas.annotations.media.Schema
+
 data class PlayerTopProjection (
 
-  val username: String,
+  @Schema(example = "An1s9n") val username: String,
 
-  val firstName: String,
+  @Schema(example = "Pavel") val firstName: String,
 
-  val lastName: String,
+  @Schema(example = "Anisimov") val lastName: String,
 
-  val sumPrizeCents: Long,
+  @Schema(example = "540") val sumPrizeCents: Long,
 )
