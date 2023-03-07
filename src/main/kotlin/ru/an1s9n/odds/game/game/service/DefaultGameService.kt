@@ -1,5 +1,6 @@
 package ru.an1s9n.odds.game.game.service
 
+import org.slf4j.LoggerFactory
 import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.stereotype.Service
 import ru.an1s9n.odds.game.bet.model.Bet
@@ -17,31 +18,32 @@ class DefaultGameService(
   private val transactionalProxyHelperGameService: TransactionalProxyHelperGameService,
 ) : GameService {
 
-  override suspend fun validateRequestAndPlay(player: Player, playRequest: PlayRequest): Bet {
-    val walletCents = player.walletCents
-    val betCents = playRequest.betCredits * 100
-    val betNumber = playRequest.betNumber
+  private val log = LoggerFactory.getLogger(this.javaClass)
 
-    validate(walletCents, betCents, betNumber)?.let { violations -> throw InvalidRequestException(violations) }
+  override suspend fun validateRequestAndPlay(player: Player, playRequest: PlayRequest): Bet {
+    log.info("incoming play request: $playRequest from player $player")
+    validate(player, playRequest)?.let { violations -> throw InvalidRequestException(violations) }
 
     return try {
-      transactionalProxyHelperGameService.doPlay(player, betNumber, betCents)
+      transactionalProxyHelperGameService.doPlay(player, playRequest.betNumber, playRequest.betCredits * 100)
+        .also { log.info("game successfully played: $it") }
     } catch (e: OptimisticLockingFailureException) {
       validateRequestAndPlay(playerService.getById(player.id!!)!!, playRequest)
     }
   }
 
-  private fun validate(walletCents: Long, betCents: Long, betNumber: Int): List<String>? =
+  private fun validate(player: Player, playRequest: PlayRequest): List<String>? =
     buildList {
-      if (betCents <= 0) {
-        add("bet must be positive")
+      if (playRequest.betCredits <= 0) {
+        add("betCredits must be grater than 0")
       }
-      if (walletCents < betCents) {
-        add("insufficient wallet: required $betCents cents, on wallet $walletCents cents")
+      if (player.walletCents < playRequest.betCredits * 100) {
+        add("insufficient wallet: required ${playRequest.betCredits * 100} cents, on wallet ${player.walletCents} cents")
       }
       val gameRange = gameRangeService.gameRange
-      if (betNumber !in gameRange) {
-        add("betNumber $betNumber is out of $gameRange game range")
+      if (playRequest.betNumber !in gameRange) {
+        add("betNumber ${playRequest.betNumber} is out of $gameRange game range")
       }
     }.ifEmpty { null }
+      ?.also { log.info("play request $playRequest from player $player is invalid: $it") }
 }

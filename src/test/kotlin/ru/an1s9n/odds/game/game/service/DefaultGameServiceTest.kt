@@ -131,7 +131,7 @@ internal class DefaultGameServiceTest(
       val e = assertThrows<InvalidRequestException> {
         spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequest(betNumber = 125, betCredits = -3))
       }
-      assertEquals("bet must be positive", e.message)
+      assertEquals("betCredits must be grater than 0", e.message)
     }
   }
 

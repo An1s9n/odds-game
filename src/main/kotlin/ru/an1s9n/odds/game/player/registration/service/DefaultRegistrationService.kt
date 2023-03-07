@@ -1,5 +1,6 @@
 package ru.an1s9n.odds.game.player.registration.service
 
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import ru.an1s9n.odds.game.config.properties.GameProperties
@@ -22,10 +23,13 @@ class DefaultRegistrationService(
   private val jwtService: JwtService,
 ) : RegistrationService {
 
+  private val log = LoggerFactory.getLogger(this.javaClass)
+
   private val registrationCents = gameProperties.registrationCredits * 100
 
   @Transactional
   override suspend fun validateRequestAndRegister(registrationRequest: RegistrationRequest): RegistrationResponse {
+    log.info("incoming registration request: $registrationRequest")
     validate(registrationRequest)?.let { violations -> throw InvalidRequestException(violations) }
 
     val player = playerService.add(
@@ -46,6 +50,7 @@ class DefaultRegistrationService(
     )
 
     return RegistrationResponse(player, jwtService.createTokenWith(player.id))
+      .also { log.info("new player successfully registered: $it") }
   }
 
   private fun validate(registrationRequest: RegistrationRequest): List<String>? =
@@ -60,4 +65,5 @@ class DefaultRegistrationService(
         add("lastName can not be blank")
       }
     }.ifEmpty { null }
+      ?.also { log.info("registration request $registrationRequest is invalid: $it") }
 }
