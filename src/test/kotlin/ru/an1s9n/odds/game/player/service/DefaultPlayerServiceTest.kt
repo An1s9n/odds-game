@@ -4,16 +4,22 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.ComponentScan
+import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.test.context.TestConstructor
 import ru.an1s9n.odds.game.bet.model.Bet
 import ru.an1s9n.odds.game.bet.repository.BetRepository
 import ru.an1s9n.odds.game.player.model.Player
+import ru.an1s9n.odds.game.player.registration.exception.UsernameAlreadyTakenException
 import ru.an1s9n.odds.game.player.repository.PlayerRepository
 import ru.an1s9n.odds.game.util.nowUtc
+import java.util.UUID
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 @DataR2dbcTest
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
@@ -26,6 +32,74 @@ internal class DefaultPlayerServiceTest(
   @AfterEach
   internal fun cleanupDb() {
     listOf(betRepository, playerRepository).forEach { repo -> runBlocking { repo.deleteAll() } }
+  }
+
+  @Test
+  internal fun `test getById when player exists, ensure player fetched`() {
+    runBlocking {
+      val testPlayer = playerRepository.save(Player(username = "An1s9n", firstName = "Pavel", lastName = "Anisimov", walletCents = 0))
+      val fetchedPlayer = defaultPlayerService.getById(testPlayer.id!!)
+
+      assertNotNull(fetchedPlayer)
+      assertEquals("An1s9n", fetchedPlayer.username)
+    }
+  }
+
+  @Test
+  internal fun `test getById when player does not exist, ensure null returned`() {
+    runBlocking {
+      val fetchedPlayer = defaultPlayerService.getById(UUID.randomUUID())
+
+      assertNull(fetchedPlayer)
+    }
+  }
+
+  @Test
+  internal fun `test add, ensure new player added`() {
+    runBlocking {
+      val newPlayer = defaultPlayerService.add(Player(username = "An1s9n", firstName = "Pavel", lastName = "Anisimov", walletCents = 0))
+
+      val fetchedPlayer = playerRepository.findById(newPlayer.id!!)
+      assertNotNull(fetchedPlayer)
+      assertEquals("An1s9n", fetchedPlayer.username)
+    }
+  }
+
+  @Test
+  internal fun `test add when user with such username exists, ensure UsernameAlreadyTakenException thrown`() {
+    runBlocking {
+      playerRepository.save(Player(username = "An1s9n", firstName = "Fedor", lastName = "Fedorov", walletCents = 0))
+
+      val e = assertThrows<UsernameAlreadyTakenException> {
+        defaultPlayerService.add(Player(username = "An1s9n", firstName = "Pavel", lastName = "Anisimov", walletCents = 0))
+      }
+      assertEquals("username An1s9n is already taken", e.message)
+    }
+  }
+
+  @Test
+  internal fun `ensure addToWallet adds and subtracts specified sum to player's wallet`() {
+    runBlocking {
+      val testPlayer = playerRepository.save(Player(username = "An1s9n", firstName = "Pavel", lastName = "Anisimov", walletCents = 15))
+
+      defaultPlayerService.addToWallet(testPlayer, 5)
+      defaultPlayerService.addToWallet(testPlayer, -7)
+
+      assertEquals(13, playerRepository.findById(testPlayer.id!!)!!.walletCents)
+    }
+  }
+
+  @Test
+  internal fun `ensure addToWallet throws OptimisticLockingFailureException if player's version changed`() {
+    runBlocking {
+      val testPlayer = playerRepository.save(Player(username = "An1s9n", firstName = "Pavel", lastName = "Anisimov", walletCents = 15))
+      val testPlayerCopy = testPlayer.copy()
+
+      defaultPlayerService.addToWallet(testPlayer, 2)
+      assertThrows<OptimisticLockingFailureException> { defaultPlayerService.addToWallet(testPlayerCopy, 3) }
+
+      assertEquals(17, playerRepository.findById(testPlayer.id!!)!!.walletCents)
+    }
   }
 
   @Test
