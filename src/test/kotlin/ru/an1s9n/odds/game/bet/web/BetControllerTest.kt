@@ -3,34 +3,26 @@ package ru.an1s9n.odds.game.bet.web
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
-import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.context.annotation.ComponentScan
-import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.test.context.TestConstructor
 import org.springframework.test.web.reactive.server.WebTestClient
+import reactor.core.publisher.Mono
 import ru.an1s9n.odds.game.bet.model.Bet
 import ru.an1s9n.odds.game.bet.service.BetService
-import ru.an1s9n.odds.game.jwt.JwtService
 import ru.an1s9n.odds.game.player.model.Player
-import ru.an1s9n.odds.game.player.service.PlayerService
 import ru.an1s9n.odds.game.util.nowUtc
 import ru.an1s9n.odds.game.web.resolver.PlayerArgumentResolver
 import java.util.UUID
-
-private const val MOCK_TOKEN = "mock-token"
 
 @WebFluxTest(BetController::class)
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 internal class BetControllerTest(
   private val webTestClient: WebTestClient,
+  @MockkBean private val mockPlayerArgumentResolver: PlayerArgumentResolver,
   @MockkBean private val betService: BetService,
-  @MockkBean private val jwtService: JwtService,
-  @MockkBean private val playerService: PlayerService,
 ) {
 
   private val testPlayer = Player(id = UUID.randomUUID(), username = "An1s9n", firstName = "Pavel", lastName = "Anisimov", walletCents = 700)
@@ -41,8 +33,8 @@ internal class BetControllerTest(
 
   @BeforeEach
   internal fun initMocks() {
-    every { jwtService.validateAndExtractIdFrom(MOCK_TOKEN) } returns testPlayer.id
-    every { runBlocking { playerService.getById(eq(testPlayer.id!!)) } } returns testPlayer
+    every { mockPlayerArgumentResolver.supportsParameter(match { it.parameterType == Player::class.java }) } returns true
+    every { mockPlayerArgumentResolver.resolveArgument(any(), any(), any()) } returns Mono.just(testPlayer)
   }
 
   @Test
@@ -52,7 +44,6 @@ internal class BetControllerTest(
 
     webTestClient.get()
       .uri("/bet/my")
-      .header(HttpHeaders.AUTHORIZATION, MOCK_TOKEN)
       .exchange()
       .expectStatus().isOk
       .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -65,7 +56,6 @@ internal class BetControllerTest(
 
     webTestClient.get()
       .uri("/bet/my?page=3&perPage=1")
-      .header(HttpHeaders.AUTHORIZATION, MOCK_TOKEN)
       .exchange()
       .expectStatus().isOk
       .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -76,14 +66,9 @@ internal class BetControllerTest(
   internal fun `ensure my endpoint prohibits invalid pagination parameters`() {
     webTestClient.get()
       .uri("/bet/my?page=-1&perPage=270")
-      .header(HttpHeaders.AUTHORIZATION, MOCK_TOKEN)
       .exchange()
       .expectStatus().isBadRequest
       .expectHeader().contentType(MediaType.APPLICATION_PROBLEM_JSON)
       .expectBody().jsonPath("$.title").isEqualTo("ConstraintViolationException")
   }
-
-  @TestConfiguration(proxyBeanMethods = false)
-  @ComponentScan(basePackageClasses = [PlayerArgumentResolver::class])
-  internal class BetControllerTestConfig
 }
