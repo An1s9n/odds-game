@@ -10,6 +10,8 @@ import java.util.UUID
 
 private const val ID = "id"
 
+private const val BEARER_PREFIX = "Bearer "
+
 @Service
 class Auth0JwtService(
   @Value("\${app.jwt.secret}") secret: String,
@@ -19,23 +21,25 @@ class Auth0JwtService(
 
   private val verifier = JWT.require(algorithm).build()
 
-  override fun createTokenWith(id: UUID): String = JWT.create().withClaim(ID, id.toString()).sign(algorithm)
+  override fun createTokenWith(id: UUID): String =
+    BEARER_PREFIX + JWT.create().withClaim(ID, id.toString()).sign(algorithm)
 
   override fun validateAndExtractIdFrom(token: String): UUID? {
-    if (!isValid(token)) {
+    val sanitizedToken = token.substringAfter(BEARER_PREFIX)
+    if (!isValid(sanitizedToken)) {
       return null
     }
 
     return try {
-      UUID.fromString(JWT.decode(token).getClaim(ID).asString())
+      UUID.fromString(JWT.decode(sanitizedToken).getClaim(ID).asString())
     } catch (ignored: JWTDecodeException) {
       null
     }
   }
 
-  private fun isValid(token: String): Boolean =
+  private fun isValid(sanitizedToken: String): Boolean =
     try {
-      verifier.verify(token)
+      verifier.verify(sanitizedToken)
       true
     } catch (ignored: JWTVerificationException) {
       false
