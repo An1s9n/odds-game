@@ -53,7 +53,7 @@ internal class TransactionControllerTest(
 
   @Test
   internal fun `ensure my endpoint works correctly with user-specified pagination parameters`() {
-    every { mockTransactionService.findAllByPlayerFreshFirst(eq(testPlayer), eq(3), eq(1)) } returns
+    every { mockTransactionService.findAllByPlayerFreshFirst(testPlayer, 3, 1) } returns
       flowOf(testTransaction2)
 
     webTestClient.get()

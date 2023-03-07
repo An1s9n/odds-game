@@ -52,7 +52,7 @@ internal class BetControllerTest(
 
   @Test
   internal fun `ensure my endpoint works correctly with user-specified pagination parameters`() {
-    every { mockBetService.findAllByPlayerFreshFirst(eq(testPlayer), eq(3), eq(1)) } returns flowOf(testBet2)
+    every { mockBetService.findAllByPlayerFreshFirst(testPlayer, 3, 1) } returns flowOf(testBet2)
 
     webTestClient.get()
       .uri("/bet/my?page=3&perPage=1")
