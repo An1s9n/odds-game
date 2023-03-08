@@ -3,6 +3,9 @@ spring:
     base-path: "/api/v1"
 
 app:
+  group-id: "${project.groupId}"
+  artifact-id: "${project.artifactId}"
+  version: "${project.version}"
   jwt:
     secret: "supa-dupa-mega-hyper-awesome-unbelievably-strong-secret"
   game:
