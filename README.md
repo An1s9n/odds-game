@@ -29,7 +29,7 @@ on [swagger-ui](http://localhost:8080/api/v1/swagger-ui.html)
 * The application is completely non-blocking: web layer is built on Spring WebFlux and data access performed with help
   of Spring Data R2DBC
 * Application uses in-memory H2 database for simplicity
-* To avoid concurrent game requests from the same player optimistic locking mechanism is used
+* To correctly handle concurrent game requests from the same player optimistic locking mechanism is used
 * To authenticate players simple JWTs are used. Player obtains token after registration and is expected to pass it
   in `Authorization` header with all requests requiring authentication
 * Tests are JUnit 5 based, Mockk is used for mocking
