@@ -83,9 +83,8 @@ internal class DefaultPlayerServiceTest(
       val testPlayer = playerRepository.save(Player(username = "An1s9n", firstName = "Pavel", lastName = "Anisimov", walletCents = 15))
 
       defaultPlayerService.addToWallet(testPlayer, 5)
-      defaultPlayerService.addToWallet(testPlayer, -7)
 
-      assertEquals(13, playerRepository.findById(testPlayer.id!!)!!.walletCents)
+      assertEquals(20, playerRepository.findById(testPlayer.id!!)!!.walletCents)
     }
   }
 

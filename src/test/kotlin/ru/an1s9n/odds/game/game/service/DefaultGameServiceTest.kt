@@ -66,8 +66,8 @@ internal class DefaultGameServiceTest(
     runBlocking {
       val testPlayer = persistTestPlayer()
       spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequest(betNumber = 130, betCredits = 2))
-      spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequest(betNumber = 129, betCredits = 3))
-      spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequest(betNumber = 128, betCredits = 6))
+      spyDefaultGameService.validateRequestAndPlay(playerRepository.findAll().first(), PlayRequest(betNumber = 129, betCredits = 3))
+      spyDefaultGameService.validateRequestAndPlay(playerRepository.findAll().first(), PlayRequest(betNumber = 128, betCredits = 6))
 
       assertEquals(100, playerRepository.findAll().first().walletCents)
 
@@ -139,12 +139,11 @@ internal class DefaultGameServiceTest(
   internal fun `test play when 2 games are concurrent, ensure retry is performed to handle optimistic locking exception`() {
     runBlocking {
       val testPlayer = persistTestPlayer()
-      val testPlayerCopy = testPlayer.copy()
       val firstGame = launch {
         spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequest(betNumber = 129, betCredits = 1))
       }
       val secondGame = launch {
-        spyDefaultGameService.validateRequestAndPlay(testPlayerCopy, PlayRequest(betNumber = 128, betCredits = 2))
+        spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequest(betNumber = 128, betCredits = 2))
       }
       listOf(firstGame, secondGame).forEach { it.join() }
 
@@ -178,13 +177,12 @@ internal class DefaultGameServiceTest(
   internal fun `test play when 2 games are concurrent and first game exhausts player's wallet, ensure second game is not allowed`() {
     runBlocking {
       val testPlayer = persistTestPlayer()
-      val testPlayerCopy = testPlayer.copy()
       val firstGame = launch {
         spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequest(betNumber = 128, betCredits = 5))
       }
       val secondGame = launch {
         val e = assertThrows<InvalidRequestException> {
-          spyDefaultGameService.validateRequestAndPlay(testPlayerCopy, PlayRequest(betNumber = 130, betCredits = 1))
+          spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequest(betNumber = 130, betCredits = 1))
         }
         assertEquals("insufficient wallet: required 100 cents, on wallet 0 cents", e.message)
       }

@@ -23,8 +23,11 @@ class DefaultPlayerService(
       throw UsernameAlreadyTakenException(player.username)
     }
 
-  override suspend fun addToWallet(player: Player, addCents: Long): Player =
-    playerRepository.save(player.apply { walletCents += addCents })
+  override suspend fun addToWallet(player: Player, addCents: Long): Player {
+    val playerCopy = player.copy()
+    playerCopy.walletCents += addCents
+    return playerRepository.save(playerCopy)
+  }
 
   override fun getTopBySumPrize(page: Int, perPage: Int): Flow<PlayerTopProjection> =
     playerRepository.findTopByPrizeSum(perPage, (page - 1) * perPage)
