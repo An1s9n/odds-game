@@ -41,7 +41,12 @@ class BetController(
   )
   fun my(
     @Parameter(hidden = true) player: Player,
-    @Min(1) @RequestParam(name = "page", defaultValue = "1") page: Int,
-    @Min(1) @Max(100) @RequestParam(name = "perPage", defaultValue = "20") perPage: Int,
+    @Min(1)
+    @RequestParam(name = "page", defaultValue = "1")
+    page: Int,
+    @Min(1)
+    @Max(100)
+    @RequestParam(name = "perPage", defaultValue = "20")
+    perPage: Int,
   ): Flow<Bet> = betService.findAllByPlayerFreshFirst(player, page, perPage)
 }

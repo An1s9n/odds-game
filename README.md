@@ -7,8 +7,8 @@ number and win or lose based on how far from randomly generated number their bet
 
 ## getting started
 
-1. Ensure you have at least JDK 17 and Maven 3 installed on your machine
-2. Run `git clone git@github.com:An1s9n/odds-game.git` to clone this repository and `cd` into it
+1. Ensure you have at least JDK 17 and updated Maven installed on your machine
+2. Run `git clone git@github.com:An1s9n/odds-game.git` to clone the repository and `cd odds-game` into cloned repository
 3. Run `mvn test` to ensure the application builds successfully
 4. Run `mvn spring-boot:run` to boot the application
 5. Go to [swagger-ui](http://localhost:8080/api/v1/swagger-ui.html) and you are ready to explore the API!
@@ -23,7 +23,6 @@ defined based on how far from randomly generated number player's bet is. Prize-d
 of `app.game.offset-to-prize-fun` configuration property. Each player can also request his bets, wallet transactions and
 current balance. It is also possible to view top players ranked by total winnings. For more details see REST API docs
 on [swagger-ui](http://localhost:8080/api/v1/swagger-ui.html)
-
 
 ## some implementation details
 

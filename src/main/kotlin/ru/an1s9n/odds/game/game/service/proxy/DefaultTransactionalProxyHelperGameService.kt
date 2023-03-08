@@ -30,7 +30,7 @@ class DefaultTransactionalProxyHelperGameService(
         timestampUtc = nowUtc(),
         amountCents = -betCents,
         type = TransactionType.BET,
-      )
+      ),
     )
     val prizeNumber = gameRangeService.generatePrizeNumber()
     val prizeCents = prizeService.definePrizeCents(betNumber, prizeNumber, betCents)
@@ -41,7 +41,7 @@ class DefaultTransactionalProxyHelperGameService(
           timestampUtc = nowUtc(),
           amountCents = prizeCents,
           type = TransactionType.PRIZE,
-        )
+        ),
       )
     }
     playerService.addToWallet(player, prizeCents - betCents)
@@ -53,7 +53,7 @@ class DefaultTransactionalProxyHelperGameService(
         betCents = betCents,
         prizeNumber = prizeNumber,
         prizeCents = prizeCents,
-      )
+      ),
     )
   }
 }

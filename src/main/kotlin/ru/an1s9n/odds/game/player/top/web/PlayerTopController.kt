@@ -24,7 +24,12 @@ class PlayerTopController(
   @GetMapping
   @Operation(summary = "get top players ranked by total winnings")
   fun top(
-    @Min(1) @RequestParam(name = "page", defaultValue = "1") page: Int,
-    @Min(1) @Max(100) @RequestParam(name = "perPage", defaultValue = "20") perPage: Int,
+    @Min(1)
+    @RequestParam(name = "page", defaultValue = "1")
+    page: Int,
+    @Min(1)
+    @Max(100)
+    @RequestParam(name = "perPage", defaultValue = "20")
+    perPage: Int,
   ): Flow<PlayerTopProjection> = playerService.getTopBySumPrize(page, perPage)
 }

@@ -10,10 +10,12 @@ import ru.an1s9n.odds.game.config.properties.GameProperties
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-@SpringBootTest(properties = [
-  "app.game.range.left-inclusive=2",
-  "app.game.range.right-inclusive=7",
-])
+@SpringBootTest(
+  properties = [
+    "app.game.range.left-inclusive=2",
+    "app.game.range.right-inclusive=7",
+  ],
+)
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 internal class DefaultGameRangeServiceTest(
   private val defaultRandomService: DefaultGameRangeService,

@@ -25,13 +25,14 @@ class PlayerArgumentResolver(
   override fun resolveArgument(
     parameter: MethodParameter,
     bindingContext: BindingContext,
-    exchange: ServerWebExchange
+    exchange: ServerWebExchange,
   ): Mono<Any> {
     return Mono.defer {
       exchange.request.headers[HttpHeaders.AUTHORIZATION]?.firstOrNull()
         ?.let { token -> jwtService.validateAndExtractIdFrom(token) }
-        ?.let { id -> mono { playerService.getById(id) }
-          .switchIfEmpty(Mono.error(UnauthenticatedException()))
+        ?.let { id ->
+          mono { playerService.getById(id) }
+            .switchIfEmpty(Mono.error(UnauthenticatedException()))
         }
         ?: Mono.error(UnauthenticatedException())
     }

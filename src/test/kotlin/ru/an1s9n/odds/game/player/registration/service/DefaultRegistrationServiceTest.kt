@@ -55,7 +55,7 @@ internal class DefaultRegistrationServiceTest(
           username = "An1s9n",
           firstName = "Pavel",
           lastName = "Anisimov",
-        )
+        ),
       )
 
       assertEquals(1, playerRepository.count())
@@ -84,7 +84,7 @@ internal class DefaultRegistrationServiceTest(
           username = "  An1s9n",
           firstName = "Pavel  ",
           lastName = "  Anisimov  ",
-        )
+        ),
       )
 
       assertEquals(1, playerRepository.count())
@@ -105,7 +105,7 @@ internal class DefaultRegistrationServiceTest(
             username = "An1s9n",
             firstName = "",
             lastName = " ",
-          )
+          ),
         )
       }
 
@@ -122,7 +122,7 @@ internal class DefaultRegistrationServiceTest(
           firstName = "Pavel",
           lastName = "Anisimov",
           walletCents = 0,
-        )
+        ),
       )
 
       assertThrows<UsernameAlreadyTakenException> {
@@ -131,7 +131,7 @@ internal class DefaultRegistrationServiceTest(
             username = "An1s9n",
             firstName = "Pavel",
             lastName = "Anisimov",
-          )
+          ),
         )
       }
     }
@@ -148,7 +148,7 @@ internal class DefaultRegistrationServiceTest(
             username = "An1s9n",
             firstName = "Pavel",
             lastName = "Anisimov",
-          )
+          ),
         )
       }
 

@@ -38,7 +38,7 @@ class DefaultRegistrationService(
         firstName = registrationRequest.firstName.trim(),
         lastName = registrationRequest.lastName.trim(),
         walletCents = registrationCents,
-      )
+      ),
     )
     transactionService.add(
       Transaction(
@@ -46,7 +46,7 @@ class DefaultRegistrationService(
         timestampUtc = nowUtc(),
         amountCents = registrationCents,
         type = TransactionType.REGISTRATION,
-      )
+      ),
     )
 
     return RegistrationResponse(player, jwtService.createTokenWith(player.id))

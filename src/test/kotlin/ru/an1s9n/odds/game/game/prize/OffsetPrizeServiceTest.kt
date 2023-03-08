@@ -9,13 +9,15 @@ import org.springframework.test.context.TestConstructor
 import ru.an1s9n.odds.game.config.properties.GameProperties
 import kotlin.test.assertEquals
 
-@SpringBootTest(properties = [
-  "app.game.offset-to-prize-fun.0=*7",
-  "app.game.offset-to-prize-fun.1=*3",
-  "app.game.offset-to-prize-fun.2=*1",
-  "app.game.offset-to-prize-fun.3=/2",
-  "app.game.offset-to-prize-fun.4=/4",
-])
+@SpringBootTest(
+  properties = [
+    "app.game.offset-to-prize-fun.0=*7",
+    "app.game.offset-to-prize-fun.1=*3",
+    "app.game.offset-to-prize-fun.2=*1",
+    "app.game.offset-to-prize-fun.3=/2",
+    "app.game.offset-to-prize-fun.4=/4",
+  ],
+)
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 internal class OffsetPrizeServiceTest(
   private val offsetPrizeService: OffsetPrizeService,

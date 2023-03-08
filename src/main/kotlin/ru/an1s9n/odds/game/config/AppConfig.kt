@@ -13,8 +13,8 @@ import org.springframework.context.annotation.Configuration
   info = Info(
     title = "\${app.group-id}:\${app.artifact-id}",
     version = "\${app.version}",
-    description = "REST API for simple odds-based game. For more information see sources at https://github.com/An1s9n/odds-game"
-  )
+    description = "REST API for simple odds-based game. For more information see sources at https://github.com/An1s9n/odds-game",
+  ),
 )
 @SecurityScheme(
   type = SecuritySchemeType.HTTP,

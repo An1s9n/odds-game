@@ -216,11 +216,13 @@ internal class DefaultGameServiceTest(
 
   @TestConfiguration(proxyBeanMethods = false)
   @EnableConfigurationProperties(GameProperties::class)
-  @ComponentScan(basePackageClasses = [
-    GameService::class,
-    PlayerService::class,
-    TransactionService::class,
-    BetService::class,
-  ])
+  @ComponentScan(
+    basePackageClasses = [
+      GameService::class,
+      PlayerService::class,
+      TransactionService::class,
+      BetService::class,
+    ],
+  )
   internal class DefaultGameServiceTestConfig
 }

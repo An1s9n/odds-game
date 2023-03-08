@@ -41,7 +41,12 @@ class TransactionController(
   )
   fun my(
     @Parameter(hidden = true) player: Player,
-    @Min(1) @RequestParam(name = "page", defaultValue = "1") page: Int,
-    @Min(1) @Max(100) @RequestParam(name = "perPage", defaultValue = "20") perPage: Int,
+    @Min(1)
+    @RequestParam(name = "page", defaultValue = "1")
+    page: Int,
+    @Min(1)
+    @Max(100)
+    @RequestParam(name = "perPage", defaultValue = "20")
+    perPage: Int,
   ): Flow<Transaction> = transactionService.findAllByPlayerFreshFirst(player, page, perPage)
 }
