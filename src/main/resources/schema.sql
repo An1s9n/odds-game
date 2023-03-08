@@ -1,4 +1,4 @@
-create table player(
+create table if not exists player(
   id uuid default random_uuid() primary key,
   username text unique not null,
   first_name text not null,
@@ -7,7 +7,7 @@ create table player(
   version bigint default 0 not null
 );
 
-create table transaction(
+create table if not exists transaction(
   id uuid default random_uuid() primary key,
   player_id uuid references player not null,
   timestamp_utc timestamp not null,
@@ -15,7 +15,7 @@ create table transaction(
   type text not null
 );
 
-create table bet(
+create table if not exists bet(
   id uuid default random_uuid() primary key,
   player_id uuid references player not null,
   timestamp_utc timestamp not null,

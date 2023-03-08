@@ -7,7 +7,7 @@ import ru.an1s9n.odds.game.bet.service.BetService
 import ru.an1s9n.odds.game.game.prize.PrizeService
 import ru.an1s9n.odds.game.game.range.GameRangeService
 import ru.an1s9n.odds.game.player.model.Player
-import ru.an1s9n.odds.game.player.service.DefaultPlayerService
+import ru.an1s9n.odds.game.player.service.PlayerService
 import ru.an1s9n.odds.game.transaction.model.Transaction
 import ru.an1s9n.odds.game.transaction.model.TransactionType
 import ru.an1s9n.odds.game.transaction.service.TransactionService
@@ -15,7 +15,7 @@ import ru.an1s9n.odds.game.util.nowUtc
 
 @Service
 class DefaultTransactionalProxyHelperGameService(
-  private val playerService: DefaultPlayerService,
+  private val playerService: PlayerService,
   private val transactionService: TransactionService,
   private val betService: BetService,
   private val gameRangeService: GameRangeService,
