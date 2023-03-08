@@ -15,6 +15,7 @@ interface PlayerRepository : CoroutineCrudRepository<Player, UUID> {
     from player p
         join bet b on p.id = b.player_id
     group by p.id
+    having sum_prize_cents > 0
     order by sum_prize_cents desc
     limit :limit
     offset :offset

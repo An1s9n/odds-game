@@ -108,6 +108,7 @@ internal class DefaultPlayerServiceTest(
       val an1s9n = playerRepository.save(Player(username = "An1s9n", firstName = "Pavel", lastName = "Anisimov", walletCents = 0))
       val fooMan = playerRepository.save(Player(username = "FooMan", firstName = "Foo", lastName = "Ivanov", walletCents = 0))
       val barMan = playerRepository.save(Player(username = "BarMan", firstName = "Bar", lastName = "Petrov", walletCents = 0))
+      val looser = playerRepository.save(Player(username = "looser", firstName = "looser", lastName = "looserov", walletCents = 0))
       betRepository.save(Bet(playerId = an1s9n.id!!, timestampUtc = nowUtc(), betNumber = 0, betCents = 10, prizeNumber = 0, prizeCents = 70))
       betRepository.save(Bet(playerId = an1s9n.id!!, timestampUtc = nowUtc(), betNumber = 0, betCents = 10, prizeNumber = 0, prizeCents = 0))
       betRepository.save(Bet(playerId = an1s9n.id!!, timestampUtc = nowUtc(), betNumber = 0, betCents = 10, prizeNumber = 0, prizeCents = 68))
@@ -115,6 +116,7 @@ internal class DefaultPlayerServiceTest(
       betRepository.save(Bet(playerId = fooMan.id!!, timestampUtc = nowUtc(), betNumber = 0, betCents = 10, prizeNumber = 0, prizeCents = 80))
       betRepository.save(Bet(playerId = barMan.id!!, timestampUtc = nowUtc(), betNumber = 0, betCents = 10, prizeNumber = 0, prizeCents = 0))
       betRepository.save(Bet(playerId = barMan.id!!, timestampUtc = nowUtc(), betNumber = 0, betCents = 10, prizeNumber = 0, prizeCents = 270))
+      betRepository.save(Bet(playerId = looser.id!!, timestampUtc = nowUtc(), betNumber = 0, betCents = 10, prizeNumber = 0, prizeCents = 0))
 
       with(defaultPlayerService.getTopBySumPrize(page = 1, perPage = 2).toList()) {
         assertEquals(2, size)
