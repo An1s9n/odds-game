@@ -32,9 +32,10 @@ class SecurityConfig {
       .httpBasic { it.authenticationEntryPoint(HttpStatusServerEntryPoint(HttpStatus.UNAUTHORIZED)) }
       .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
       .addFilterAt(bearerAuthenticationWebFilter, SecurityWebFiltersOrder.AUTHENTICATION)
-      .authorizeExchange { it
-        .pathMatchers("/player/register", "/player/top", "/swagger-ui.html", "/v3/api-docs/**", "/webjars/swagger-ui/**").permitAll()
-        .anyExchange().authenticated()
+      .authorizeExchange {
+        it
+          .pathMatchers("/player/register", "/player/top", "/swagger-ui.html", "/v3/api-docs/**", "/webjars/swagger-ui/**").permitAll()
+          .anyExchange().authenticated()
       }
       .build()
 }

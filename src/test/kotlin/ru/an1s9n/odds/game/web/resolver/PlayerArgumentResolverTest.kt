@@ -44,21 +44,23 @@ internal class PlayerArgumentResolverTest {
   @Test
   internal fun `ensure valid player resolves correctly`() {
     every { ReactiveSecurityContextHolder.getContext() } returns
-      Mono.just(SecurityContextImpl().apply {
-        authentication = UsernamePasswordAuthenticationToken(
-          testPlayer.id!!,
-          null,
-          AuthorityUtils.NO_AUTHORITIES
-        )
-      })
+      Mono.just(
+        SecurityContextImpl().apply {
+          authentication = UsernamePasswordAuthenticationToken(
+            testPlayer.id!!,
+            null,
+            AuthorityUtils.NO_AUTHORITIES,
+          )
+        },
+      )
     every { runBlocking { mockPlayerService.getById(testPlayer.id!!) } } returns testPlayer
 
     StepVerifier.create(
       playerArgumentResolver.resolveArgument(
         playerMethodParameter,
         BindingContext(),
-        MockServerWebExchange.builder(MockServerHttpRequest.get("mock-url")).build()
-      )
+        MockServerWebExchange.builder(MockServerHttpRequest.get("mock-url")).build(),
+      ),
     ).expectNext(testPlayer).expectComplete().verify()
   }
 
@@ -70,8 +72,8 @@ internal class PlayerArgumentResolverTest {
       playerArgumentResolver.resolveArgument(
         playerMethodParameter,
         BindingContext(),
-        MockServerWebExchange.builder(MockServerHttpRequest.get("mock-url")).build()
-      )
+        MockServerWebExchange.builder(MockServerHttpRequest.get("mock-url")).build(),
+      ),
     ).expectError(IllegalStateException::class.java).verify()
   }
 
@@ -83,69 +85,75 @@ internal class PlayerArgumentResolverTest {
       playerArgumentResolver.resolveArgument(
         playerMethodParameter,
         BindingContext(),
-        MockServerWebExchange.builder(MockServerHttpRequest.get("mock-url")).build()
-      )
+        MockServerWebExchange.builder(MockServerHttpRequest.get("mock-url")).build(),
+      ),
     ).expectError(IllegalStateException::class.java).verify()
   }
 
   @Test
   internal fun `ensure IllegalStateException thrown if player is not authenticated`() {
     every { ReactiveSecurityContextHolder.getContext() } returns
-      Mono.just(SecurityContextImpl().apply {
-        authentication = UsernamePasswordAuthenticationToken(
-          testPlayer.id!!,
-          null,
-          AuthorityUtils.NO_AUTHORITIES
-        ).apply { isAuthenticated = false }
-      })
+      Mono.just(
+        SecurityContextImpl().apply {
+          authentication = UsernamePasswordAuthenticationToken(
+            testPlayer.id!!,
+            null,
+            AuthorityUtils.NO_AUTHORITIES,
+          ).apply { isAuthenticated = false }
+        },
+      )
 
     StepVerifier.create(
       playerArgumentResolver.resolveArgument(
         playerMethodParameter,
         BindingContext(),
-        MockServerWebExchange.builder(MockServerHttpRequest.get("mock-url")).build()
-      )
+        MockServerWebExchange.builder(MockServerHttpRequest.get("mock-url")).build(),
+      ),
     ).expectError(IllegalStateException::class.java).verify()
   }
 
   @Test
   internal fun `ensure IllegalStateException thrown if principal is not a valid UUID`() {
     every { ReactiveSecurityContextHolder.getContext() } returns
-      Mono.just(SecurityContextImpl().apply {
-        authentication = UsernamePasswordAuthenticationToken(
-          "not-a-valid-uuid",
-          null,
-          AuthorityUtils.NO_AUTHORITIES
-        )
-      })
+      Mono.just(
+        SecurityContextImpl().apply {
+          authentication = UsernamePasswordAuthenticationToken(
+            "not-a-valid-uuid",
+            null,
+            AuthorityUtils.NO_AUTHORITIES,
+          )
+        },
+      )
 
     StepVerifier.create(
       playerArgumentResolver.resolveArgument(
         playerMethodParameter,
         BindingContext(),
-        MockServerWebExchange.builder(MockServerHttpRequest.get("mock-url")).build()
-      )
+        MockServerWebExchange.builder(MockServerHttpRequest.get("mock-url")).build(),
+      ),
     ).expectError(IllegalStateException::class.java).verify()
   }
 
   @Test
   internal fun `ensure IllegalStateException thrown if player not exists`() {
     every { ReactiveSecurityContextHolder.getContext() } returns
-      Mono.just(SecurityContextImpl().apply {
-        authentication = UsernamePasswordAuthenticationToken(
-          testPlayer.id!!,
-          null,
-          AuthorityUtils.NO_AUTHORITIES
-        )
-      })
+      Mono.just(
+        SecurityContextImpl().apply {
+          authentication = UsernamePasswordAuthenticationToken(
+            testPlayer.id!!,
+            null,
+            AuthorityUtils.NO_AUTHORITIES,
+          )
+        },
+      )
     every { runBlocking { mockPlayerService.getById(testPlayer.id!!) } } returns null
 
     StepVerifier.create(
       playerArgumentResolver.resolveArgument(
         playerMethodParameter,
         BindingContext(),
-        MockServerWebExchange.builder(MockServerHttpRequest.get("mock-url")).build()
-      )
+        MockServerWebExchange.builder(MockServerHttpRequest.get("mock-url")).build(),
+      ),
     ).expectError(IllegalStateException::class.java).verify()
   }
 

@@ -25,7 +25,7 @@ class PlayerArgumentResolver(
     bindingContext: BindingContext,
     exchange: ServerWebExchange,
   ): Mono<Any> =
-     ReactiveSecurityContextHolder.getContext()
+    ReactiveSecurityContextHolder.getContext()
       .mapNotNull { securityContext -> securityContext.authentication }
       .filter { authentication -> authentication.isAuthenticated }
       .mapNotNull { authentication -> authentication.principal as? UUID }

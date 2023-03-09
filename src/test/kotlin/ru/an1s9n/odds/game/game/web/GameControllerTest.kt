@@ -27,7 +27,7 @@ import java.util.UUID
 
 @WebFluxTest(
   controllers = [GameController::class],
-  properties = ["app.jwt.secret=test-secret"]
+  properties = ["app.jwt.secret=test-secret"],
 )
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 internal class GameControllerTest(

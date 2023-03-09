@@ -4,8 +4,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import ru.an1s9n.odds.game.auth.BEARER_PREFIX
-import ru.an1s9n.odds.game.config.properties.GameProperties
 import ru.an1s9n.odds.game.auth.jwt.JwtService
+import ru.an1s9n.odds.game.config.properties.GameProperties
 import ru.an1s9n.odds.game.player.model.Player
 import ru.an1s9n.odds.game.player.registration.request.RegistrationRequest
 import ru.an1s9n.odds.game.player.registration.response.RegistrationResponse
