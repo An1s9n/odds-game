@@ -15,6 +15,9 @@ import org.springframework.test.context.TestConstructor
 import org.springframework.test.web.reactive.server.WebTestClient
 import reactor.core.publisher.Mono
 import ru.an1s9n.odds.game.auth.BearerAuthenticationWebFilter
+import ru.an1s9n.odds.game.auth.TEST_AUTH_HEADER
+import ru.an1s9n.odds.game.auth.TEST_AUTH_PLAYER_ID
+import ru.an1s9n.odds.game.auth.TEST_JWT_SECRET
 import ru.an1s9n.odds.game.config.SecurityConfig
 import ru.an1s9n.odds.game.player.model.Player
 import ru.an1s9n.odds.game.transaction.model.Transaction
@@ -26,7 +29,7 @@ import java.util.UUID
 
 @WebFluxTest(
   controllers = [TransactionController::class],
-  properties = ["app.jwt.secret=test-secret"],
+  properties = ["app.jwt.secret=$TEST_JWT_SECRET"],
 )
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 internal class TransactionControllerTest(
@@ -35,7 +38,7 @@ internal class TransactionControllerTest(
   @MockkBean private val mockTransactionService: TransactionService,
 ) {
 
-  private val testPlayer = Player(id = UUID.fromString("52fbf507-b259-43f6-9750-78c90c4e2dde"), username = "An1s9n", firstName = "Pavel", lastName = "Anisimov", walletCents = 700)
+  private val testPlayer = Player(id = UUID.fromString(TEST_AUTH_PLAYER_ID), username = "An1s9n", firstName = "Pavel", lastName = "Anisimov", walletCents = 700)
 
   private val testTransaction1 = Transaction(playerId = testPlayer.id!!, timestampUtc = nowUtc(), amountCents = 50, type = TransactionType.PRIZE)
 
@@ -54,7 +57,7 @@ internal class TransactionControllerTest(
 
     webTestClient.get()
       .uri("/transaction/my")
-      .header(HttpHeaders.AUTHORIZATION, "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjUyZmJmNTA3LWIyNTktNDNmNi05NzUwLTc4YzkwYzRlMmRkZSJ9.gyDFGtKmdhYehiQeEAM9iB0Jlr41NDMlCP8mRMhPL-A")
+      .header(HttpHeaders.AUTHORIZATION, TEST_AUTH_HEADER)
       .exchange()
       .expectStatus().isOk
       .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -68,7 +71,7 @@ internal class TransactionControllerTest(
 
     webTestClient.get()
       .uri("/transaction/my?page=3&perPage=1")
-      .header(HttpHeaders.AUTHORIZATION, "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjUyZmJmNTA3LWIyNTktNDNmNi05NzUwLTc4YzkwYzRlMmRkZSJ9.gyDFGtKmdhYehiQeEAM9iB0Jlr41NDMlCP8mRMhPL-A")
+      .header(HttpHeaders.AUTHORIZATION, TEST_AUTH_HEADER)
       .exchange()
       .expectStatus().isOk
       .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -79,7 +82,7 @@ internal class TransactionControllerTest(
   internal fun `ensure my endpoint prohibits invalid pagination parameters`() {
     webTestClient.get()
       .uri("/transaction/my?page=-1&perPage=270")
-      .header(HttpHeaders.AUTHORIZATION, "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjUyZmJmNTA3LWIyNTktNDNmNi05NzUwLTc4YzkwYzRlMmRkZSJ9.gyDFGtKmdhYehiQeEAM9iB0Jlr41NDMlCP8mRMhPL-A")
+      .header(HttpHeaders.AUTHORIZATION, TEST_AUTH_HEADER)
       .exchange()
       .expectStatus().isBadRequest
       .expectHeader().contentType(MediaType.APPLICATION_PROBLEM_JSON)

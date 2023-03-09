@@ -14,6 +14,9 @@ import org.springframework.test.context.TestConstructor
 import org.springframework.test.web.reactive.server.WebTestClient
 import reactor.core.publisher.Mono
 import ru.an1s9n.odds.game.auth.BearerAuthenticationWebFilter
+import ru.an1s9n.odds.game.auth.TEST_AUTH_HEADER
+import ru.an1s9n.odds.game.auth.TEST_AUTH_PLAYER_ID
+import ru.an1s9n.odds.game.auth.TEST_JWT_SECRET
 import ru.an1s9n.odds.game.config.SecurityConfig
 import ru.an1s9n.odds.game.player.model.Player
 import ru.an1s9n.odds.game.web.resolver.PlayerArgumentResolver
@@ -21,7 +24,7 @@ import java.util.UUID
 
 @WebFluxTest(
   controllers = [PlayerController::class],
-  properties = ["app.jwt.secret=test-secret"],
+  properties = ["app.jwt.secret=$TEST_JWT_SECRET"],
 )
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 internal class PlayerControllerTest(
@@ -29,7 +32,7 @@ internal class PlayerControllerTest(
   @MockkBean private val mockPlayerArgumentResolver: PlayerArgumentResolver,
 ) {
 
-  private val testPlayer = Player(UUID.fromString("52fbf507-b259-43f6-9750-78c90c4e2dde"), username = "An1s9n", firstName = "Pavel", lastName = "Anisimov", walletCents = 700)
+  private val testPlayer = Player(UUID.fromString(TEST_AUTH_PLAYER_ID), username = "An1s9n", firstName = "Pavel", lastName = "Anisimov", walletCents = 700)
 
   @BeforeEach
   internal fun initMocks() {
@@ -41,7 +44,7 @@ internal class PlayerControllerTest(
   internal fun `ensure me endpoint works correctly`() {
     webTestClient.get()
       .uri("/player/me")
-      .header(HttpHeaders.AUTHORIZATION, "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjUyZmJmNTA3LWIyNTktNDNmNi05NzUwLTc4YzkwYzRlMmRkZSJ9.gyDFGtKmdhYehiQeEAM9iB0Jlr41NDMlCP8mRMhPL-A")
+      .header(HttpHeaders.AUTHORIZATION, TEST_AUTH_HEADER)
       .exchange()
       .expectStatus().isOk
       .expectHeader().contentType(MediaType.APPLICATION_JSON)

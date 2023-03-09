@@ -15,6 +15,9 @@ import org.springframework.test.context.TestConstructor
 import org.springframework.test.web.reactive.server.WebTestClient
 import reactor.core.publisher.Mono
 import ru.an1s9n.odds.game.auth.BearerAuthenticationWebFilter
+import ru.an1s9n.odds.game.auth.TEST_AUTH_HEADER
+import ru.an1s9n.odds.game.auth.TEST_AUTH_PLAYER_ID
+import ru.an1s9n.odds.game.auth.TEST_JWT_SECRET
 import ru.an1s9n.odds.game.bet.model.Bet
 import ru.an1s9n.odds.game.config.SecurityConfig
 import ru.an1s9n.odds.game.game.model.request.PlayRequest
@@ -27,7 +30,7 @@ import java.util.UUID
 
 @WebFluxTest(
   controllers = [GameController::class],
-  properties = ["app.jwt.secret=test-secret"],
+  properties = ["app.jwt.secret=$TEST_JWT_SECRET"],
 )
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 internal class GameControllerTest(
@@ -36,7 +39,7 @@ internal class GameControllerTest(
   @MockkBean private val mockGameService: GameService,
 ) {
 
-  private val testPlayer = Player(id = UUID.fromString("52fbf507-b259-43f6-9750-78c90c4e2dde"), username = "An1s9n", firstName = "Pavel", lastName = "Anisimov", walletCents = 700)
+  private val testPlayer = Player(id = UUID.fromString(TEST_AUTH_PLAYER_ID), username = "An1s9n", firstName = "Pavel", lastName = "Anisimov", walletCents = 700)
 
   private val testPlayRequest = PlayRequest(betNumber = 10, betCredits = 5)
 
@@ -53,7 +56,7 @@ internal class GameControllerTest(
 
     webTestClient.post()
       .uri("/game/play")
-      .header(HttpHeaders.AUTHORIZATION, "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjUyZmJmNTA3LWIyNTktNDNmNi05NzUwLTc4YzkwYzRlMmRkZSJ9.gyDFGtKmdhYehiQeEAM9iB0Jlr41NDMlCP8mRMhPL-A")
+      .header(HttpHeaders.AUTHORIZATION, TEST_AUTH_HEADER)
       .bodyValue(testPlayRequest)
       .exchange()
       .expectStatus().isOk
@@ -68,7 +71,7 @@ internal class GameControllerTest(
 
     webTestClient.post()
       .uri("/game/play")
-      .header(HttpHeaders.AUTHORIZATION, "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjUyZmJmNTA3LWIyNTktNDNmNi05NzUwLTc4YzkwYzRlMmRkZSJ9.gyDFGtKmdhYehiQeEAM9iB0Jlr41NDMlCP8mRMhPL-A")
+      .header(HttpHeaders.AUTHORIZATION, TEST_AUTH_HEADER)
       .bodyValue(testPlayRequest)
       .exchange()
       .expectStatus().isBadRequest
