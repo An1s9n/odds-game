@@ -1,83 +1,154 @@
 package ru.an1s9n.odds.game.web.resolver
 
-import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkStatic
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
-import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.context.annotation.ComponentScan
-import org.springframework.http.HttpHeaders
-import org.springframework.http.MediaType
-import org.springframework.test.context.TestConstructor
-import org.springframework.test.web.reactive.server.WebTestClient
-import ru.an1s9n.odds.game.jwt.JwtService
+import org.springframework.core.MethodParameter
+import org.springframework.mock.http.server.reactive.MockServerHttpRequest
+import org.springframework.mock.web.server.MockServerWebExchange
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.authority.AuthorityUtils
+import org.springframework.security.core.context.ReactiveSecurityContextHolder
+import org.springframework.security.core.context.SecurityContextImpl
+import org.springframework.web.reactive.BindingContext
+import reactor.core.publisher.Mono
+import reactor.test.StepVerifier
 import ru.an1s9n.odds.game.player.model.Player
 import ru.an1s9n.odds.game.player.service.PlayerService
 import java.util.UUID
+import kotlin.reflect.jvm.javaMethod
+import kotlin.test.assertTrue
 
-@WebFluxTest(PlayerArgumentResolvingTestController::class)
-@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
-internal class PlayerArgumentResolverTest(
-  private val webTestClient: WebTestClient,
-  @MockkBean private val mockPlayerService: PlayerService,
-  @MockkBean private val mockJwtService: JwtService,
-) {
+internal class PlayerArgumentResolverTest {
 
-  private val testPlayer = Player(id = UUID.randomUUID(), username = "An1s9n", firstName = "Pavel", lastName = "Anisimov", walletCents = 700)
+  init {
+    mockkStatic(ReactiveSecurityContextHolder::class)
+  }
+
+  private val mockPlayerService: PlayerService = mockk()
+
+  private val playerArgumentResolver: PlayerArgumentResolver = PlayerArgumentResolver(mockPlayerService)
+
+  private val testPlayer =
+    Player(id = UUID.randomUUID(), username = "An1s9n", firstName = "Pavel", lastName = "Anisimov", walletCents = 700)
+
+  private val playerMethodParameter: MethodParameter = MethodParameter(this::funWithPlayerArg.javaMethod!!, 0)
 
   @Test
-  internal fun `ensure valid user resolves correctly`() {
-    every { mockJwtService.validateAndExtractIdFrom("mock-token") } returns testPlayer.id
+  internal fun `ensure Player class supported`() {
+    assertTrue(playerArgumentResolver.supportsParameter(playerMethodParameter))
+  }
+
+  @Test
+  internal fun `ensure valid player resolves correctly`() {
+    every { ReactiveSecurityContextHolder.getContext() } returns
+      Mono.just(SecurityContextImpl().apply {
+        authentication = UsernamePasswordAuthenticationToken(
+          testPlayer.id!!,
+          null,
+          AuthorityUtils.NO_AUTHORITIES
+        )
+      })
     every { runBlocking { mockPlayerService.getById(testPlayer.id!!) } } returns testPlayer
 
-    webTestClient.get()
-      .uri("/test/resolve-player")
-      .header(HttpHeaders.AUTHORIZATION, "mock-token")
-      .exchange()
-      .expectStatus().isOk
-      .expectHeader().contentType(MediaType.APPLICATION_JSON)
-      .expectBody(Player::class.java).isEqualTo(testPlayer)
+    StepVerifier.create(
+      playerArgumentResolver.resolveArgument(
+        playerMethodParameter,
+        BindingContext(),
+        MockServerWebExchange.builder(MockServerHttpRequest.get("mock-url")).build()
+      )
+    ).expectNext(testPlayer).expectComplete().verify()
   }
 
   @Test
-  internal fun `ensure 401 thrown token is not provided`() {
-    webTestClient.get()
-      .uri("/test/resolve-player")
-      .exchange()
-      .expectStatus().isUnauthorized
-      .expectHeader().contentType(MediaType.APPLICATION_PROBLEM_JSON)
-      .expectBody().jsonPath("$.title").isEqualTo("UnauthenticatedException")
+  internal fun `ensure IllegalStateException thrown if securityContext missing`() {
+    every { ReactiveSecurityContextHolder.getContext() } returns Mono.empty()
+
+    StepVerifier.create(
+      playerArgumentResolver.resolveArgument(
+        playerMethodParameter,
+        BindingContext(),
+        MockServerWebExchange.builder(MockServerHttpRequest.get("mock-url")).build()
+      )
+    ).expectError(IllegalStateException::class.java).verify()
   }
 
   @Test
-  internal fun `ensure 401 thrown in case of invalid token`() {
-    every { mockJwtService.validateAndExtractIdFrom("invalid-mock-token") } returns null
+  internal fun `ensure IllegalStateException thrown if authentication missing`() {
+    every { ReactiveSecurityContextHolder.getContext() } returns Mono.just(SecurityContextImpl())
 
-    webTestClient.get()
-      .uri("/test/resolve-player")
-      .header(HttpHeaders.AUTHORIZATION, "invalid-mock-token")
-      .exchange()
-      .expectStatus().isUnauthorized
-      .expectHeader().contentType(MediaType.APPLICATION_PROBLEM_JSON)
-      .expectBody().jsonPath("$.title").isEqualTo("UnauthenticatedException")
+    StepVerifier.create(
+      playerArgumentResolver.resolveArgument(
+        playerMethodParameter,
+        BindingContext(),
+        MockServerWebExchange.builder(MockServerHttpRequest.get("mock-url")).build()
+      )
+    ).expectError(IllegalStateException::class.java).verify()
   }
 
   @Test
-  internal fun `ensure 401 thrown in case of valid token but non-existent player`() {
-    every { mockJwtService.validateAndExtractIdFrom("mock-token") } returns UUID.randomUUID()
-    every { runBlocking { mockPlayerService.getById(any()) } } returns null
+  internal fun `ensure IllegalStateException thrown if player is not authenticated`() {
+    every { ReactiveSecurityContextHolder.getContext() } returns
+      Mono.just(SecurityContextImpl().apply {
+        authentication = UsernamePasswordAuthenticationToken(
+          testPlayer.id!!,
+          null,
+          AuthorityUtils.NO_AUTHORITIES
+        ).apply { isAuthenticated = false }
+      })
 
-    webTestClient.get()
-      .uri("/test/resolve-player")
-      .header(HttpHeaders.AUTHORIZATION, "mock-token")
-      .exchange()
-      .expectStatus().isUnauthorized
-      .expectHeader().contentType(MediaType.APPLICATION_PROBLEM_JSON)
-      .expectBody().jsonPath("$.title").isEqualTo("UnauthenticatedException")
+    StepVerifier.create(
+      playerArgumentResolver.resolveArgument(
+        playerMethodParameter,
+        BindingContext(),
+        MockServerWebExchange.builder(MockServerHttpRequest.get("mock-url")).build()
+      )
+    ).expectError(IllegalStateException::class.java).verify()
   }
 
-  @TestConfiguration(proxyBeanMethods = false)
-  @ComponentScan(basePackageClasses = [PlayerArgumentResolver::class])
-  internal class PlayerArgumentResolverTestConfig
+  @Test
+  internal fun `ensure IllegalStateException thrown if principal is not a valid UUID`() {
+    every { ReactiveSecurityContextHolder.getContext() } returns
+      Mono.just(SecurityContextImpl().apply {
+        authentication = UsernamePasswordAuthenticationToken(
+          "not-a-valid-uuid",
+          null,
+          AuthorityUtils.NO_AUTHORITIES
+        )
+      })
+
+    StepVerifier.create(
+      playerArgumentResolver.resolveArgument(
+        playerMethodParameter,
+        BindingContext(),
+        MockServerWebExchange.builder(MockServerHttpRequest.get("mock-url")).build()
+      )
+    ).expectError(IllegalStateException::class.java).verify()
+  }
+
+  @Test
+  internal fun `ensure IllegalStateException thrown if player not exists`() {
+    every { ReactiveSecurityContextHolder.getContext() } returns
+      Mono.just(SecurityContextImpl().apply {
+        authentication = UsernamePasswordAuthenticationToken(
+          testPlayer.id!!,
+          null,
+          AuthorityUtils.NO_AUTHORITIES
+        )
+      })
+    every { runBlocking { mockPlayerService.getById(testPlayer.id!!) } } returns null
+
+    StepVerifier.create(
+      playerArgumentResolver.resolveArgument(
+        playerMethodParameter,
+        BindingContext(),
+        MockServerWebExchange.builder(MockServerHttpRequest.get("mock-url")).build()
+      )
+    ).expectError(IllegalStateException::class.java).verify()
+  }
+
+  private fun funWithPlayerArg(player: Player) {
+  }
 }

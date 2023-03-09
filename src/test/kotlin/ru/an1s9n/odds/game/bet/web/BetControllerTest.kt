@@ -6,18 +6,27 @@ import kotlinx.coroutines.flow.flowOf
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
+import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.context.annotation.ComponentScan
+import org.springframework.context.annotation.Import
+import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.test.context.TestConstructor
 import org.springframework.test.web.reactive.server.WebTestClient
 import reactor.core.publisher.Mono
+import ru.an1s9n.odds.game.auth.BearerAuthenticationWebFilter
 import ru.an1s9n.odds.game.bet.model.Bet
 import ru.an1s9n.odds.game.bet.service.BetService
+import ru.an1s9n.odds.game.config.SecurityConfig
 import ru.an1s9n.odds.game.player.model.Player
 import ru.an1s9n.odds.game.util.nowUtc
 import ru.an1s9n.odds.game.web.resolver.PlayerArgumentResolver
 import java.util.UUID
 
-@WebFluxTest(BetController::class)
+@WebFluxTest(
+  controllers = [BetController::class],
+  properties = ["app.jwt.secret=test-secret"],
+)
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 internal class BetControllerTest(
   private val webTestClient: WebTestClient,
@@ -25,7 +34,7 @@ internal class BetControllerTest(
   @MockkBean private val mockBetService: BetService,
 ) {
 
-  private val testPlayer = Player(id = UUID.randomUUID(), username = "An1s9n", firstName = "Pavel", lastName = "Anisimov", walletCents = 700)
+  private val testPlayer = Player(id = UUID.fromString("52fbf507-b259-43f6-9750-78c90c4e2dde"), username = "An1s9n", firstName = "Pavel", lastName = "Anisimov", walletCents = 700)
 
   private val testBet1 = Bet(playerId = testPlayer.id!!, timestampUtc = nowUtc(), betNumber = 0, betCents = 10, prizeNumber = 5, prizeCents = 50)
 
@@ -44,6 +53,7 @@ internal class BetControllerTest(
 
     webTestClient.get()
       .uri("/bet/my")
+      .header(HttpHeaders.AUTHORIZATION, "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjUyZmJmNTA3LWIyNTktNDNmNi05NzUwLTc4YzkwYzRlMmRkZSJ9.gyDFGtKmdhYehiQeEAM9iB0Jlr41NDMlCP8mRMhPL-A")
       .exchange()
       .expectStatus().isOk
       .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -56,6 +66,7 @@ internal class BetControllerTest(
 
     webTestClient.get()
       .uri("/bet/my?page=3&perPage=1")
+      .header(HttpHeaders.AUTHORIZATION, "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjUyZmJmNTA3LWIyNTktNDNmNi05NzUwLTc4YzkwYzRlMmRkZSJ9.gyDFGtKmdhYehiQeEAM9iB0Jlr41NDMlCP8mRMhPL-A")
       .exchange()
       .expectStatus().isOk
       .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -66,9 +77,23 @@ internal class BetControllerTest(
   internal fun `ensure my endpoint prohibits invalid pagination parameters`() {
     webTestClient.get()
       .uri("/bet/my?page=-1&perPage=270")
+      .header(HttpHeaders.AUTHORIZATION, "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjUyZmJmNTA3LWIyNTktNDNmNi05NzUwLTc4YzkwYzRlMmRkZSJ9.gyDFGtKmdhYehiQeEAM9iB0Jlr41NDMlCP8mRMhPL-A")
       .exchange()
       .expectStatus().isBadRequest
       .expectHeader().contentType(MediaType.APPLICATION_PROBLEM_JSON)
       .expectBody().jsonPath("$.title").isEqualTo("ConstraintViolationException")
   }
+
+  @Test
+  internal fun `ensure my endpoint prohibits unauthenticated access`() {
+    webTestClient.get()
+      .uri("/bet/my")
+      .exchange()
+      .expectStatus().isUnauthorized
+  }
+
+  @TestConfiguration(proxyBeanMethods = false)
+  @Import(SecurityConfig::class)
+  @ComponentScan(basePackageClasses = [BearerAuthenticationWebFilter::class])
+  internal class BetControllerTestConfig
 }

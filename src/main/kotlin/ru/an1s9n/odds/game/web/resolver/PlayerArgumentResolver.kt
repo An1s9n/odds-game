@@ -2,20 +2,18 @@ package ru.an1s9n.odds.game.web.resolver
 
 import kotlinx.coroutines.reactor.mono
 import org.springframework.core.MethodParameter
-import org.springframework.http.HttpHeaders
+import org.springframework.security.core.context.ReactiveSecurityContextHolder
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.BindingContext
 import org.springframework.web.reactive.result.method.HandlerMethodArgumentResolver
 import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Mono
-import ru.an1s9n.odds.game.jwt.JwtService
 import ru.an1s9n.odds.game.player.model.Player
 import ru.an1s9n.odds.game.player.service.PlayerService
-import ru.an1s9n.odds.game.web.exception.UnauthenticatedException
+import java.util.UUID
 
 @Component
 class PlayerArgumentResolver(
-  private val jwtService: JwtService,
   private val playerService: PlayerService,
 ) : HandlerMethodArgumentResolver {
 
@@ -26,15 +24,11 @@ class PlayerArgumentResolver(
     parameter: MethodParameter,
     bindingContext: BindingContext,
     exchange: ServerWebExchange,
-  ): Mono<Any> {
-    return Mono.defer {
-      exchange.request.headers[HttpHeaders.AUTHORIZATION]?.firstOrNull()
-        ?.let { token -> jwtService.validateAndExtractIdFrom(token) }
-        ?.let { id ->
-          mono { playerService.getById(id) }
-            .switchIfEmpty(Mono.error(UnauthenticatedException()))
-        }
-        ?: Mono.error(UnauthenticatedException())
-    }
-  }
+  ): Mono<Any> =
+     ReactiveSecurityContextHolder.getContext()
+      .mapNotNull { securityContext -> securityContext.authentication }
+      .filter { authentication -> authentication.isAuthenticated }
+      .mapNotNull { authentication -> authentication.principal as? UUID }
+      .flatMap { playerId -> mono<Any> { playerService.getById(playerId!!) } }
+      .switchIfEmpty(Mono.error(IllegalStateException("failed to resolve player")))
 }

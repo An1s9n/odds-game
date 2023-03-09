@@ -12,7 +12,6 @@
     <kotlin.version>1.7.22</kotlin.version>
     <kotlin.compiler.jvmTarget>17</kotlin.compiler.jvmTarget>
     <spring.boot.versoion>3.0.4</spring.boot.versoion>
-    <java.jwt.version>4.3.0</java.jwt.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
@@ -90,7 +89,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.0.0-M7</version>
+        <version>3.0.0-M9</version>
       </plugin>
       <plugin>
         <groupId>org.springframework.boot</groupId>
@@ -119,11 +118,15 @@
       <artifactId>spring-boot-starter-webflux</artifactId>
     </dependency>
 
-    <!--JWT-->
+    <!--SECURITY-->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
     <dependency>
       <groupId>com.auth0</groupId>
       <artifactId>java-jwt</artifactId>
-      <version>${java.jwt.version}</version>
+      <version>4.3.0</version>
     </dependency>
 
     <!--COROUTINES-->
@@ -181,6 +184,11 @@
     <dependency>
       <groupId>org.jetbrains.kotlin</groupId>
       <artifactId>kotlin-test-junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.projectreactor</groupId>
+      <artifactId>reactor-test</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

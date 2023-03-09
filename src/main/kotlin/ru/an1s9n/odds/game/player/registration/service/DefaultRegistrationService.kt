@@ -3,8 +3,9 @@ package ru.an1s9n.odds.game.player.registration.service
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import ru.an1s9n.odds.game.auth.BEARER_PREFIX
 import ru.an1s9n.odds.game.config.properties.GameProperties
-import ru.an1s9n.odds.game.jwt.JwtService
+import ru.an1s9n.odds.game.auth.jwt.JwtService
 import ru.an1s9n.odds.game.player.model.Player
 import ru.an1s9n.odds.game.player.registration.request.RegistrationRequest
 import ru.an1s9n.odds.game.player.registration.response.RegistrationResponse
@@ -49,7 +50,7 @@ class DefaultRegistrationService(
       ),
     )
 
-    return RegistrationResponse(player, jwtService.createTokenWith(player.id))
+    return RegistrationResponse(player, BEARER_PREFIX + jwtService.createTokenWith(player.id))
       .also { log.info("new player successfully registered: $it") }
   }
 
