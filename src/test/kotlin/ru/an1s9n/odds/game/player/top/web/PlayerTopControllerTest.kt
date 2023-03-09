@@ -5,9 +5,14 @@ import io.mockk.every
 import kotlinx.coroutines.flow.flowOf
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
+import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.context.annotation.ComponentScan
+import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.test.context.TestConstructor
 import org.springframework.test.web.reactive.server.WebTestClient
+import ru.an1s9n.odds.game.auth.BearerAuthenticationWebFilter
+import ru.an1s9n.odds.game.config.SecurityConfig
 import ru.an1s9n.odds.game.player.service.PlayerService
 import ru.an1s9n.odds.game.player.top.response.PlayerTopProjection
 
@@ -55,4 +60,9 @@ internal class PlayerTopControllerTest(
       .expectHeader().contentType(MediaType.APPLICATION_PROBLEM_JSON)
       .expectBody().jsonPath("$.title").isEqualTo("ConstraintViolationException")
   }
+
+  @TestConfiguration(proxyBeanMethods = false)
+  @Import(SecurityConfig::class)
+  @ComponentScan(basePackageClasses = [BearerAuthenticationWebFilter::class])
+  internal class PlayerTopControllerTestConfig
 }
