@@ -5,11 +5,11 @@ import org.springframework.security.web.server.authentication.AuthenticationWebF
 import org.springframework.stereotype.Component
 
 @Component
-final class BearerAuthenticationWebFilter(
+class BearerAuthenticationWebFilter(
   reactiveAuthenticationManager: ReactiveAuthenticationManager,
 ) : AuthenticationWebFilter(reactiveAuthenticationManager) {
 
   init {
-    setServerAuthenticationConverter(BearerServerAuthenticationConverter)
+    super.setServerAuthenticationConverter(BearerServerAuthenticationConverter)
   }
 }

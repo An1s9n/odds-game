@@ -3,8 +3,11 @@ package ru.an1s9n.odds.game.web.resolver
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
 import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.springframework.core.MethodParameter
 import org.springframework.mock.http.server.reactive.MockServerHttpRequest
 import org.springframework.mock.web.server.MockServerWebExchange
@@ -21,6 +24,7 @@ import java.util.UUID
 import kotlin.reflect.jvm.javaMethod
 import kotlin.test.assertTrue
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class PlayerArgumentResolverTest {
 
   init {
@@ -35,6 +39,11 @@ internal class PlayerArgumentResolverTest {
     Player(id = UUID.randomUUID(), username = "An1s9n", firstName = "Pavel", lastName = "Anisimov", walletCents = 700)
 
   private val playerMethodParameter: MethodParameter = MethodParameter(this::funWithPlayerArg.javaMethod!!, 0)
+
+  @AfterAll
+  internal fun unmockStaticMethods() {
+    unmockkStatic(ReactiveSecurityContextHolder::class)
+  }
 
   @Test
   internal fun `ensure Player class supported`() {
