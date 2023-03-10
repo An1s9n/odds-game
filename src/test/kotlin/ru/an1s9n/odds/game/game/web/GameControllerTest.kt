@@ -21,7 +21,7 @@ import ru.an1s9n.odds.game.bet.dto.BetDto
 import ru.an1s9n.odds.game.config.SecurityConfig
 import ru.an1s9n.odds.game.game.model.request.PlayRequest
 import ru.an1s9n.odds.game.game.service.GameService
-import ru.an1s9n.odds.game.player.model.Player
+import ru.an1s9n.odds.game.player.repository.Player
 import ru.an1s9n.odds.game.util.nowUtc
 import ru.an1s9n.odds.game.web.resolver.PlayerArgumentResolver
 import java.util.UUID

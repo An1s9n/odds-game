@@ -3,8 +3,7 @@ package ru.an1s9n.odds.game.player.repository
 import kotlinx.coroutines.flow.Flow
 import org.springframework.data.r2dbc.repository.Query
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
-import ru.an1s9n.odds.game.player.model.Player
-import ru.an1s9n.odds.game.player.top.response.PlayerTopProjection
+import ru.an1s9n.odds.game.player.dto.TopPlayerDto
 import java.util.UUID
 
 interface PlayerRepository : CoroutineCrudRepository<Player, UUID> {
@@ -21,5 +20,5 @@ interface PlayerRepository : CoroutineCrudRepository<Player, UUID> {
     offset :offset
   """,
   )
-  fun findTopByPrizeSum(limit: Int, offset: Int): Flow<PlayerTopProjection>
+  fun findTopByPrizeSum(limit: Int, offset: Int): Flow<TopPlayerDto>
 }

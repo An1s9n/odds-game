@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import ru.an1s9n.odds.game.bet.dto.BetDto
 import ru.an1s9n.odds.game.bet.service.BetService
-import ru.an1s9n.odds.game.player.model.Player
+import ru.an1s9n.odds.game.player.repository.Player
 
 @RestController
 @RequestMapping("/bet")

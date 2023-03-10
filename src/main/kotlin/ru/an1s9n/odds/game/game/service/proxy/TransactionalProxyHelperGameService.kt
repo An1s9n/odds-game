@@ -2,7 +2,7 @@ package ru.an1s9n.odds.game.game.service.proxy
 
 import org.springframework.dao.OptimisticLockingFailureException
 import ru.an1s9n.odds.game.bet.dto.BetDto
-import ru.an1s9n.odds.game.player.model.Player
+import ru.an1s9n.odds.game.player.repository.Player
 
 interface TransactionalProxyHelperGameService {
 

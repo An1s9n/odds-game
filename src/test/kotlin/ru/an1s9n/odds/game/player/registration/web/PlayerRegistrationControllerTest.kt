@@ -12,7 +12,7 @@ import org.springframework.test.context.TestConstructor
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.server.ResponseStatusException
 import ru.an1s9n.odds.game.config.SecurityConfig
-import ru.an1s9n.odds.game.player.model.Player
+import ru.an1s9n.odds.game.player.dto.PlayerDto
 import ru.an1s9n.odds.game.player.registration.request.RegistrationRequest
 import ru.an1s9n.odds.game.player.registration.response.RegistrationResponse
 import ru.an1s9n.odds.game.player.registration.service.RegistrationService
@@ -31,7 +31,7 @@ internal class PlayerRegistrationControllerTest(
   @Test
   internal fun `ensure registration endpoint works correctly`() {
     val testRegistrationResponse = RegistrationResponse(
-      player = Player(id = UUID.randomUUID(), username = "An1s9n", firstName = "Pavel", lastName = "Anisimov", walletCents = 5),
+      playerDto = PlayerDto(id = UUID.randomUUID(), username = "An1s9n", firstName = "Pavel", lastName = "Anisimov", walletCents = 5),
       token = "mock-token",
     )
     every { runBlocking { mockRegistrationService.validateRequestAndRegister(testRegistrationRequest) } } returns

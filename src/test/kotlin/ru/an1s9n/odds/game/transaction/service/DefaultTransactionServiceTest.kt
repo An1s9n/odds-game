@@ -8,7 +8,7 @@ import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.test.context.TestConstructor
-import ru.an1s9n.odds.game.player.model.Player
+import ru.an1s9n.odds.game.player.repository.Player
 import ru.an1s9n.odds.game.player.repository.PlayerRepository
 import ru.an1s9n.odds.game.transaction.dto.TransactionType
 import ru.an1s9n.odds.game.transaction.repository.Transaction

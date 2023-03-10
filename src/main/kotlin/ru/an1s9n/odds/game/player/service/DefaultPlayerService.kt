@@ -5,9 +5,10 @@ import org.springframework.dao.DuplicateKeyException
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
-import ru.an1s9n.odds.game.player.model.Player
+import ru.an1s9n.odds.game.player.dto.PlayerDto
+import ru.an1s9n.odds.game.player.dto.TopPlayerDto
+import ru.an1s9n.odds.game.player.repository.Player
 import ru.an1s9n.odds.game.player.repository.PlayerRepository
-import ru.an1s9n.odds.game.player.top.response.PlayerTopProjection
 import java.util.UUID
 
 @Service
@@ -15,21 +16,29 @@ class DefaultPlayerService(
   private val playerRepository: PlayerRepository,
 ) : PlayerService {
 
-  override suspend fun getById(id: UUID): Player? = playerRepository.findById(id)
+  override suspend fun getById(id: UUID): PlayerDto? = playerRepository.findById(id)?.toDto()
 
-  override suspend fun add(player: Player): Player =
+  override suspend fun add(player: Player): PlayerDto =
     try {
-      playerRepository.save(player)
+      playerRepository.save(player).toDto()
     } catch (e: DuplicateKeyException) {
       throw ResponseStatusException(HttpStatus.BAD_REQUEST, "username ${player.username} is already taken")
     }
 
-  override suspend fun addToWallet(player: Player, addCents: Long): Player {
+  override suspend fun addToWallet(player: Player, addCents: Long): PlayerDto {
     val playerCopy = player.copy()
     playerCopy.walletCents += addCents
-    return playerRepository.save(playerCopy)
+    return playerRepository.save(playerCopy).toDto()
   }
 
-  override fun getTopBySumPrize(page: Int, perPage: Int): Flow<PlayerTopProjection> =
+  override fun getTopBySumPrize(page: Int, perPage: Int): Flow<TopPlayerDto> =
     playerRepository.findTopByPrizeSum(perPage, (page - 1) * perPage)
+
+  private fun Player.toDto() = PlayerDto(
+    id = id,
+    username = username,
+    firstName = firstName,
+    lastName = lastName,
+    walletCents = walletCents,
+  )
 }

@@ -1,8 +1,8 @@
-package ru.an1s9n.odds.game.player.top.response
+package ru.an1s9n.odds.game.player.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
 
-data class PlayerTopProjection(
+data class TopPlayerDto(
 
   @Schema(example = "An1s9n") val username: String,
 

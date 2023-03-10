@@ -11,13 +11,13 @@ import org.springframework.web.reactive.result.method.HandlerMethodArgumentResol
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Mono
-import ru.an1s9n.odds.game.player.model.Player
-import ru.an1s9n.odds.game.player.service.PlayerService
+import ru.an1s9n.odds.game.player.repository.Player
+import ru.an1s9n.odds.game.player.repository.PlayerRepository
 import java.util.UUID
 
 @Component
 class PlayerArgumentResolver(
-  private val playerService: PlayerService,
+  private val playerRepository: PlayerRepository,
 ) : HandlerMethodArgumentResolver {
 
   private val log = LoggerFactory.getLogger(this.javaClass)
@@ -34,7 +34,7 @@ class PlayerArgumentResolver(
       .mapNotNull { securityContext -> securityContext.authentication }
       .filter { authentication -> authentication.isAuthenticated }
       .mapNotNull { authentication -> authentication.principal as? UUID }
-      .flatMap { playerId -> mono<Any> { playerService.getById(playerId!!) } }
+      .flatMap { playerId -> mono<Any> { playerRepository.findById(playerId!!) } }
       .switchIfEmpty(
         Mono.defer {
           log.warn("failed to resolve player, request headers: ${exchange.request.headers}")

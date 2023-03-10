@@ -27,7 +27,7 @@ import ru.an1s9n.odds.game.config.properties.GameProperties
 import ru.an1s9n.odds.game.game.model.request.PlayRequest
 import ru.an1s9n.odds.game.game.prize.PrizeService
 import ru.an1s9n.odds.game.game.range.GameRangeService
-import ru.an1s9n.odds.game.player.model.Player
+import ru.an1s9n.odds.game.player.repository.Player
 import ru.an1s9n.odds.game.player.repository.PlayerRepository
 import ru.an1s9n.odds.game.player.service.PlayerService
 import ru.an1s9n.odds.game.transaction.dto.TransactionType

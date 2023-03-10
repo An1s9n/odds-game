@@ -15,7 +15,7 @@ number and win or lose based on how far from randomly generated number their bet
 
 ## game rules
 
-After registration each plyaer receives certain amount of credits which can be customized
+After registration each player receives certain amount of credits which can be customized
 via `app.game.registration-credits` configuration property (see [application.yml](src/main/resources/application.yml)).
 Player can place a bet on any number within game range which can be adjusted with `app.game.range` configuration
 properties. Of course player must have enough credits for bet. When bet is done, random number is generated and prize is
@@ -28,8 +28,8 @@ on [swagger-ui](http://localhost:8080/api/v1/swagger-ui.html)
 
 * The application is completely non-blocking: web layer is built on Spring WebFlux and data access performed with help
   of Spring Data R2DBC
-* Application uses in-memory H2 database for simplicity
+* Application uses in-memory H2 database without any migration tools for simplicity
 * To correctly handle concurrent game requests from the same player optimistic locking mechanism is used
 * To authenticate players simple JWTs are used. Player obtains token after registration and is expected to pass it
-  in `Authorization` header with all requests requiring authentication
+  in `Authorization` header with all requests requiring authentication. For simplicity token never expires
 * Tests are JUnit 5 based, Mockk is used for mocking

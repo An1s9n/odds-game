@@ -20,8 +20,8 @@ import org.springframework.web.reactive.BindingContext
 import org.springframework.web.server.ResponseStatusException
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
-import ru.an1s9n.odds.game.player.model.Player
-import ru.an1s9n.odds.game.player.service.PlayerService
+import ru.an1s9n.odds.game.player.repository.Player
+import ru.an1s9n.odds.game.player.repository.PlayerRepository
 import java.util.UUID
 import kotlin.reflect.jvm.javaMethod
 import kotlin.test.assertTrue
@@ -33,12 +33,11 @@ internal class PlayerArgumentResolverTest {
     mockkStatic(ReactiveSecurityContextHolder::class)
   }
 
-  private val mockPlayerService: PlayerService = mockk()
+  private val mockPlayerRepository: PlayerRepository = mockk()
 
-  private val playerArgumentResolver: PlayerArgumentResolver = PlayerArgumentResolver(mockPlayerService)
+  private val playerArgumentResolver: PlayerArgumentResolver = PlayerArgumentResolver(mockPlayerRepository)
 
-  private val testPlayer =
-    Player(id = UUID.randomUUID(), username = "An1s9n", firstName = "Pavel", lastName = "Anisimov", walletCents = 700)
+  private val testPlayer = Player(id = UUID.randomUUID(), username = "An1s9n", firstName = "Pavel", lastName = "Anisimov", walletCents = 700)
 
   private val playerMethodParameter: MethodParameter = MethodParameter(this::funWithPlayerArg.javaMethod!!, 0)
 
@@ -64,7 +63,7 @@ internal class PlayerArgumentResolverTest {
           )
         },
       )
-    every { runBlocking { mockPlayerService.getById(testPlayer.id!!) } } returns testPlayer
+    every { runBlocking { mockPlayerRepository.findById(testPlayer.id!!) } } returns testPlayer
 
     StepVerifier.create(
       playerArgumentResolver.resolveArgument(
@@ -157,7 +156,7 @@ internal class PlayerArgumentResolverTest {
           )
         },
       )
-    every { runBlocking { mockPlayerService.getById(testPlayer.id!!) } } returns null
+    every { runBlocking { mockPlayerRepository.findById(testPlayer.id!!) } } returns null
 
     StepVerifier.create(
       playerArgumentResolver.resolveArgument(

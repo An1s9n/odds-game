@@ -18,8 +18,8 @@ import org.springframework.test.context.TestConstructor
 import org.springframework.web.server.ResponseStatusException
 import ru.an1s9n.odds.game.auth.jwt.JwtService
 import ru.an1s9n.odds.game.config.properties.GameProperties
-import ru.an1s9n.odds.game.player.model.Player
 import ru.an1s9n.odds.game.player.registration.request.RegistrationRequest
+import ru.an1s9n.odds.game.player.repository.Player
 import ru.an1s9n.odds.game.player.repository.PlayerRepository
 import ru.an1s9n.odds.game.player.service.PlayerService
 import ru.an1s9n.odds.game.transaction.dto.TransactionType

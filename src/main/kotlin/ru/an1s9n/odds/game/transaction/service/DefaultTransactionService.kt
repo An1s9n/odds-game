@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
-import ru.an1s9n.odds.game.player.model.Player
+import ru.an1s9n.odds.game.player.repository.Player
 import ru.an1s9n.odds.game.transaction.dto.TransactionDto
 import ru.an1s9n.odds.game.transaction.repository.Transaction
 import ru.an1s9n.odds.game.transaction.repository.TransactionRepository

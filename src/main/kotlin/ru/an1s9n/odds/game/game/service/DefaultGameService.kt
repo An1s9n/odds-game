@@ -9,12 +9,12 @@ import ru.an1s9n.odds.game.bet.dto.BetDto
 import ru.an1s9n.odds.game.game.model.request.PlayRequest
 import ru.an1s9n.odds.game.game.range.GameRangeService
 import ru.an1s9n.odds.game.game.service.proxy.TransactionalProxyHelperGameService
-import ru.an1s9n.odds.game.player.model.Player
-import ru.an1s9n.odds.game.player.service.DefaultPlayerService
+import ru.an1s9n.odds.game.player.repository.Player
+import ru.an1s9n.odds.game.player.repository.PlayerRepository
 
 @Service
 class DefaultGameService(
-  private val playerService: DefaultPlayerService,
+  private val playerRepository: PlayerRepository,
   private val gameRangeService: GameRangeService,
   private val transactionalProxyHelperGameService: TransactionalProxyHelperGameService,
 ) : GameService {
@@ -30,7 +30,7 @@ class DefaultGameService(
       transactionalProxyHelperGameService.doPlay(player, playRequest.betNumber, playRequest.betCredits * 100)
         .also { log.info("game successfully played: $it") }
     } catch (e: OptimisticLockingFailureException) {
-      validateRequestAndPlay(playerService.getById(player.id!!)!!, playRequest)
+      validateRequestAndPlay(playerRepository.findById(player.id!!)!!, playRequest)
     }
   }
 

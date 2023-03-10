@@ -10,7 +10,7 @@ import org.springframework.context.annotation.ComponentScan
 import org.springframework.test.context.TestConstructor
 import ru.an1s9n.odds.game.bet.repository.Bet
 import ru.an1s9n.odds.game.bet.repository.BetRepository
-import ru.an1s9n.odds.game.player.model.Player
+import ru.an1s9n.odds.game.player.repository.Player
 import ru.an1s9n.odds.game.player.repository.PlayerRepository
 import ru.an1s9n.odds.game.util.nowUtc
 import kotlin.test.assertEquals

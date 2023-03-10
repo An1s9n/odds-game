@@ -7,7 +7,7 @@ import ru.an1s9n.odds.game.bet.repository.Bet
 import ru.an1s9n.odds.game.bet.service.BetService
 import ru.an1s9n.odds.game.game.prize.PrizeService
 import ru.an1s9n.odds.game.game.range.GameRangeService
-import ru.an1s9n.odds.game.player.model.Player
+import ru.an1s9n.odds.game.player.repository.Player
 import ru.an1s9n.odds.game.player.service.PlayerService
 import ru.an1s9n.odds.game.transaction.dto.TransactionType
 import ru.an1s9n.odds.game.transaction.repository.Transaction

@@ -10,8 +10,8 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.TestConstructor
 import org.springframework.test.web.reactive.server.WebTestClient
 import ru.an1s9n.odds.game.config.SecurityConfig
+import ru.an1s9n.odds.game.player.dto.TopPlayerDto
 import ru.an1s9n.odds.game.player.service.PlayerService
-import ru.an1s9n.odds.game.player.top.response.PlayerTopProjection
 
 @WebFluxTest(PlayerTopController::class)
 @Import(SecurityConfig::class)
@@ -21,9 +21,9 @@ internal class PlayerTopControllerTest(
   @MockkBean private val mockPlayerService: PlayerService,
 ) {
 
-  private val testTopPlayer1 = PlayerTopProjection(username = "An1s9n", firstName = "Pavel", lastName = "Anisimov", sumPrizeCents = 700)
+  private val testTopPlayer1 = TopPlayerDto(username = "An1s9n", firstName = "Pavel", lastName = "Anisimov", sumPrizeCents = 700)
 
-  private val testTopPlayer2 = PlayerTopProjection(username = "BlahPlayer", firstName = "Blah", lastName = "Ivanov", sumPrizeCents = 600)
+  private val testTopPlayer2 = TopPlayerDto(username = "BlahPlayer", firstName = "Blah", lastName = "Ivanov", sumPrizeCents = 600)
 
   @Test
   internal fun `ensure top endpoint works correctly`() {
@@ -34,7 +34,7 @@ internal class PlayerTopControllerTest(
       .exchange()
       .expectStatus().isOk
       .expectHeader().contentType(MediaType.APPLICATION_JSON)
-      .expectBodyList(PlayerTopProjection::class.java).hasSize(2).contains(testTopPlayer1).contains(testTopPlayer2)
+      .expectBodyList(TopPlayerDto::class.java).hasSize(2).contains(testTopPlayer1).contains(testTopPlayer2)
   }
 
   @Test
@@ -46,7 +46,7 @@ internal class PlayerTopControllerTest(
       .exchange()
       .expectStatus().isOk
       .expectHeader().contentType(MediaType.APPLICATION_JSON)
-      .expectBodyList(PlayerTopProjection::class.java).hasSize(1).contains(testTopPlayer2)
+      .expectBodyList(TopPlayerDto::class.java).hasSize(1).contains(testTopPlayer2)
   }
 
   @Test

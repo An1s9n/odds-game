@@ -14,7 +14,7 @@ import org.springframework.test.context.TestConstructor
 import org.springframework.web.server.ResponseStatusException
 import ru.an1s9n.odds.game.bet.repository.Bet
 import ru.an1s9n.odds.game.bet.repository.BetRepository
-import ru.an1s9n.odds.game.player.model.Player
+import ru.an1s9n.odds.game.player.repository.Player
 import ru.an1s9n.odds.game.player.repository.PlayerRepository
 import ru.an1s9n.odds.game.util.nowUtc
 import java.util.UUID

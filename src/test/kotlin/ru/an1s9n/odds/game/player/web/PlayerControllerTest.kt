@@ -15,7 +15,7 @@ import ru.an1s9n.odds.game.auth.TEST_AUTH_HEADER
 import ru.an1s9n.odds.game.auth.TEST_AUTH_PLAYER_ID
 import ru.an1s9n.odds.game.auth.TEST_JWT_SECRET
 import ru.an1s9n.odds.game.config.SecurityConfig
-import ru.an1s9n.odds.game.player.model.Player
+import ru.an1s9n.odds.game.player.repository.Player
 import ru.an1s9n.odds.game.web.resolver.PlayerArgumentResolver
 import java.util.UUID
 
