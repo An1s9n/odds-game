@@ -16,7 +16,6 @@ import ru.an1s9n.odds.game.player.model.Player
 import ru.an1s9n.odds.game.player.registration.request.RegistrationRequest
 import ru.an1s9n.odds.game.player.registration.response.RegistrationResponse
 import ru.an1s9n.odds.game.player.registration.service.RegistrationService
-import ru.an1s9n.odds.game.web.exception.InvalidRequestException
 import java.util.UUID
 
 @WebFluxTest(PlayerRegistrationController::class)
@@ -62,16 +61,16 @@ internal class PlayerRegistrationControllerTest(
   }
 
   @Test
-  internal fun `ensure registration endpoint returns 400 in case of InvalidRequestException`() {
+  internal fun `ensure registration endpoint returns 400 in case of invalid request ResponseStatusException`() {
     every { runBlocking { mockRegistrationService.validateRequestAndRegister(testRegistrationRequest) } } throws
-      InvalidRequestException(emptyList())
+      ResponseStatusException(HttpStatus.BAD_REQUEST, "some-message")
 
     webTestClient.post()
       .uri("/player/register")
       .bodyValue(testRegistrationRequest)
       .exchange()
       .expectStatus().isBadRequest
-      .expectHeader().contentType(MediaType.APPLICATION_PROBLEM_JSON)
-      .expectBody().jsonPath("$.title").isEqualTo("InvalidRequestException")
+      .expectHeader().contentType(MediaType.APPLICATION_JSON)
+      .expectBody().jsonPath("$.message").isEqualTo("some-message")
   }
 }

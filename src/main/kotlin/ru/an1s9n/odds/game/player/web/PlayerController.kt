@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
-import org.springframework.http.ProblemDetail
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -24,7 +23,7 @@ class PlayerController {
     summary = "get currently authenticated player",
     responses = [
       ApiResponse(responseCode = "200", description = "ok", content = [Content(schema = Schema(implementation = Player::class), mediaType = "application/json")]),
-      ApiResponse(responseCode = "401", description = "invalid token", content = [Content(schema = Schema(implementation = ProblemDetail::class), mediaType = "application/problem+json")]),
+      ApiResponse(responseCode = "401", description = "invalid token", content = [Content()]),
     ],
   )
   suspend fun me(@Parameter(hidden = true) player: Player): Player = player

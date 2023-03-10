@@ -25,7 +25,6 @@ import ru.an1s9n.odds.game.player.service.PlayerService
 import ru.an1s9n.odds.game.transaction.model.TransactionType
 import ru.an1s9n.odds.game.transaction.repository.TransactionRepository
 import ru.an1s9n.odds.game.transaction.service.TransactionService
-import ru.an1s9n.odds.game.web.exception.InvalidRequestException
 import kotlin.test.assertEquals
 
 @DataR2dbcTest(properties = ["app.game.registration-credits=27"])
@@ -98,9 +97,9 @@ internal class DefaultRegistrationServiceTest(
   }
 
   @Test
-  internal fun `test player registration when input contains blank fields, ensure InvalidRequestException thrown`() {
+  internal fun `test player registration when input contains blank fields, ensure invalid request ResponseStatusException thrown`() {
     runBlocking {
-      val e = assertThrows<InvalidRequestException> {
+      val e = assertThrows<ResponseStatusException> {
         defaultRegistrationService.validateRequestAndRegister(
           RegistrationRequest(
             username = "An1s9n",
@@ -110,7 +109,7 @@ internal class DefaultRegistrationServiceTest(
         )
       }
 
-      assertEquals("firstName can not be blank, lastName can not be blank", e.message)
+      assertEquals("firstName can not be blank, lastName can not be blank", e.reason)
     }
   }
 

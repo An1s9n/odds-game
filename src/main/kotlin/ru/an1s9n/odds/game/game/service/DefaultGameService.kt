@@ -2,14 +2,15 @@ package ru.an1s9n.odds.game.game.service
 
 import org.slf4j.LoggerFactory
 import org.springframework.dao.OptimisticLockingFailureException
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import org.springframework.web.server.ResponseStatusException
 import ru.an1s9n.odds.game.bet.model.Bet
 import ru.an1s9n.odds.game.game.model.request.PlayRequest
 import ru.an1s9n.odds.game.game.range.GameRangeService
 import ru.an1s9n.odds.game.game.service.proxy.TransactionalProxyHelperGameService
 import ru.an1s9n.odds.game.player.model.Player
 import ru.an1s9n.odds.game.player.service.DefaultPlayerService
-import ru.an1s9n.odds.game.web.exception.InvalidRequestException
 
 @Service
 class DefaultGameService(
@@ -22,7 +23,8 @@ class DefaultGameService(
 
   override suspend fun validateRequestAndPlay(player: Player, playRequest: PlayRequest): Bet {
     log.info("incoming play request: $playRequest from player $player")
-    validate(player, playRequest)?.let { violations -> throw InvalidRequestException(violations) }
+    validate(player, playRequest)
+      ?.let { violations -> throw ResponseStatusException(HttpStatus.BAD_REQUEST, violations.joinToString()) }
 
     return try {
       transactionalProxyHelperGameService.doPlay(player, playRequest.betNumber, playRequest.betCredits * 100)

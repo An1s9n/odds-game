@@ -1,6 +1,10 @@
 package ru.an1s9n.odds.game.player.top.web
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.ArraySchema
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
@@ -22,7 +26,13 @@ class PlayerTopController(
 ) {
 
   @GetMapping
-  @Operation(summary = "get top players ranked by total winnings")
+  @Operation(
+    summary = "get top players ranked by total winnings",
+    responses = [
+      ApiResponse(responseCode = "200", description = "ok", content = [Content(array = ArraySchema(schema = Schema(implementation = PlayerTopProjection::class)), mediaType = "application/json")]),
+      ApiResponse(responseCode = "400", description = "invalid request", content = [Content()]),
+    ],
+  )
   fun top(
     @Min(1)
     @RequestParam(name = "page", defaultValue = "1")

@@ -8,9 +8,11 @@ import org.junit.jupiter.api.Test
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.test.context.TestConstructor
 import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.web.server.ResponseStatusException
 import reactor.core.publisher.Mono
 import ru.an1s9n.odds.game.auth.TEST_AUTH_HEADER
 import ru.an1s9n.odds.game.auth.TEST_AUTH_PLAYER_ID
@@ -21,7 +23,6 @@ import ru.an1s9n.odds.game.game.model.request.PlayRequest
 import ru.an1s9n.odds.game.game.service.GameService
 import ru.an1s9n.odds.game.player.model.Player
 import ru.an1s9n.odds.game.util.nowUtc
-import ru.an1s9n.odds.game.web.exception.InvalidRequestException
 import ru.an1s9n.odds.game.web.resolver.PlayerArgumentResolver
 import java.util.UUID
 
@@ -63,9 +64,9 @@ internal class GameControllerTest(
   }
 
   @Test
-  internal fun `ensure play endpoint returns 400 in case of InvalidRequestException`() {
+  internal fun `ensure play endpoint returns 400 in case of invalid request ResponseStatusException`() {
     every { runBlocking { mockGameService.validateRequestAndPlay(testPlayer, testPlayRequest) } } throws
-      InvalidRequestException(emptyList())
+      ResponseStatusException(HttpStatus.BAD_REQUEST, "some-message")
 
     webTestClient.post()
       .uri("/game/play")
@@ -73,8 +74,8 @@ internal class GameControllerTest(
       .bodyValue(testPlayRequest)
       .exchange()
       .expectStatus().isBadRequest
-      .expectHeader().contentType(MediaType.APPLICATION_PROBLEM_JSON)
-      .expectBody().jsonPath("$.title").isEqualTo("InvalidRequestException")
+      .expectHeader().contentType(MediaType.APPLICATION_JSON)
+      .expectBody().jsonPath("$.message").isEqualTo("some-message")
   }
 
   @Test

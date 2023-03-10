@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
-import org.springframework.http.ProblemDetail
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -30,8 +29,8 @@ class GameController(
     summary = "bet on a number and play the game",
     responses = [
       ApiResponse(responseCode = "200", description = "ok", content = [Content(schema = Schema(implementation = Bet::class), mediaType = "application/json")]),
-      ApiResponse(responseCode = "400", description = "invalid playRequest", content = [Content(schema = Schema(implementation = ProblemDetail::class), mediaType = "application/problem+json")]),
-      ApiResponse(responseCode = "401", description = "invalid token", content = [Content(schema = Schema(implementation = ProblemDetail::class), mediaType = "application/problem+json")]),
+      ApiResponse(responseCode = "400", description = "invalid playRequest", content = [Content()]),
+      ApiResponse(responseCode = "401", description = "invalid token", content = [Content()]),
     ],
   )
   suspend fun play(@Parameter(hidden = true) player: Player, @RequestBody playRequest: PlayRequest): Bet =

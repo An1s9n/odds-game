@@ -1,8 +1,10 @@
 package ru.an1s9n.odds.game.player.registration.service
 
 import org.slf4j.LoggerFactory
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.server.ResponseStatusException
 import ru.an1s9n.odds.game.auth.BEARER_PREFIX
 import ru.an1s9n.odds.game.auth.jwt.JwtService
 import ru.an1s9n.odds.game.config.properties.GameProperties
@@ -14,7 +16,6 @@ import ru.an1s9n.odds.game.transaction.model.Transaction
 import ru.an1s9n.odds.game.transaction.model.TransactionType
 import ru.an1s9n.odds.game.transaction.service.TransactionService
 import ru.an1s9n.odds.game.util.nowUtc
-import ru.an1s9n.odds.game.web.exception.InvalidRequestException
 
 @Service
 class DefaultRegistrationService(
@@ -31,7 +32,8 @@ class DefaultRegistrationService(
   @Transactional
   override suspend fun validateRequestAndRegister(registrationRequest: RegistrationRequest): RegistrationResponse {
     log.info("incoming registration request: $registrationRequest")
-    validate(registrationRequest)?.let { violations -> throw InvalidRequestException(violations) }
+    validate(registrationRequest)
+      ?.let { violations -> throw ResponseStatusException(HttpStatus.BAD_REQUEST, violations.joinToString()) }
 
     val player = playerService.add(
       Player(
