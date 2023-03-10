@@ -6,15 +6,12 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
-import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.test.context.TestConstructor
 import org.springframework.test.web.reactive.server.WebTestClient
 import reactor.core.publisher.Mono
-import ru.an1s9n.odds.game.auth.BearerAuthenticationWebFilter
 import ru.an1s9n.odds.game.auth.TEST_AUTH_HEADER
 import ru.an1s9n.odds.game.auth.TEST_AUTH_PLAYER_ID
 import ru.an1s9n.odds.game.auth.TEST_JWT_SECRET
@@ -32,6 +29,7 @@ import java.util.UUID
   controllers = [GameController::class],
   properties = ["app.jwt.secret=$TEST_JWT_SECRET"],
 )
+@Import(SecurityConfig::class)
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 internal class GameControllerTest(
   private val webTestClient: WebTestClient,
@@ -87,9 +85,4 @@ internal class GameControllerTest(
       .exchange()
       .expectStatus().isUnauthorized
   }
-
-  @TestConfiguration(proxyBeanMethods = false)
-  @Import(SecurityConfig::class)
-  @ComponentScan(basePackageClasses = [BearerAuthenticationWebFilter::class])
-  internal class GameControllerTestConfig
 }

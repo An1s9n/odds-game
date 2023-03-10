@@ -166,6 +166,6 @@ internal class PlayerArgumentResolverTest {
     ).expectError(IllegalStateException::class.java).verify()
   }
 
-  private fun funWithPlayerArg(player: Player) {
+  private fun funWithPlayerArg(@Suppress("unused_parameter") player: Player) {
   }
 }

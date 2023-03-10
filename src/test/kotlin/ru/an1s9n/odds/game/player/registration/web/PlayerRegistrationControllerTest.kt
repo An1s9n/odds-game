@@ -5,13 +5,10 @@ import io.mockk.every
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
-import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.test.context.TestConstructor
 import org.springframework.test.web.reactive.server.WebTestClient
-import ru.an1s9n.odds.game.auth.BearerAuthenticationWebFilter
 import ru.an1s9n.odds.game.config.SecurityConfig
 import ru.an1s9n.odds.game.player.model.Player
 import ru.an1s9n.odds.game.player.registration.exception.UsernameAlreadyTakenException
@@ -22,6 +19,7 @@ import ru.an1s9n.odds.game.web.exception.InvalidRequestException
 import java.util.UUID
 
 @WebFluxTest(PlayerRegistrationController::class)
+@Import(SecurityConfig::class)
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 internal class PlayerRegistrationControllerTest(
   private val webTestClient: WebTestClient,
@@ -75,9 +73,4 @@ internal class PlayerRegistrationControllerTest(
       .expectHeader().contentType(MediaType.APPLICATION_PROBLEM_JSON)
       .expectBody().jsonPath("$.title").isEqualTo("InvalidRequestException")
   }
-
-  @TestConfiguration(proxyBeanMethods = false)
-  @Import(SecurityConfig::class)
-  @ComponentScan(basePackageClasses = [BearerAuthenticationWebFilter::class])
-  internal class PlayerRegistrationControllerTestConfig
 }
