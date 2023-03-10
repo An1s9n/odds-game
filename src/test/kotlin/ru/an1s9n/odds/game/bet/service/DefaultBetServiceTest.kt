@@ -7,7 +7,9 @@ import org.junit.jupiter.api.Test
 import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.ComponentScan
+import org.springframework.context.annotation.FilterType
 import org.springframework.test.context.TestConstructor
+import ru.an1s9n.odds.game.OddsGameApp
 import ru.an1s9n.odds.game.bet.repository.Bet
 import ru.an1s9n.odds.game.bet.repository.BetRepository
 import ru.an1s9n.odds.game.player.repository.Player
@@ -68,6 +70,15 @@ internal class DefaultBetServiceTest(
   }
 
   @TestConfiguration(proxyBeanMethods = false)
-  @ComponentScan(basePackageClasses = [BetService::class])
+  @ComponentScan(
+    basePackageClasses = [OddsGameApp::class],
+    useDefaultFilters = false,
+    includeFilters = [
+      ComponentScan.Filter(
+        type = FilterType.ASSIGNABLE_TYPE,
+        classes = [BetService::class],
+      ),
+    ],
+  )
   internal class DefaultBetServiceTestConfig
 }

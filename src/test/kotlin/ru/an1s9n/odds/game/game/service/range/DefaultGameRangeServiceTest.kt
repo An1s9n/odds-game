@@ -1,4 +1,4 @@
-package ru.an1s9n.odds.game.game.range
+package ru.an1s9n.odds.game.game.service.range
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.context.properties.EnableConfigurationProperties

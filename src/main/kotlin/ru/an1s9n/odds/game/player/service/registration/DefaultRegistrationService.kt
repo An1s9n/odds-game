@@ -1,4 +1,4 @@
-package ru.an1s9n.odds.game.player.registration.service
+package ru.an1s9n.odds.game.player.service.registration
 
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -8,8 +8,8 @@ import org.springframework.web.server.ResponseStatusException
 import ru.an1s9n.odds.game.auth.BEARER_PREFIX
 import ru.an1s9n.odds.game.auth.jwt.JwtService
 import ru.an1s9n.odds.game.config.properties.GameProperties
-import ru.an1s9n.odds.game.player.registration.request.RegistrationRequest
-import ru.an1s9n.odds.game.player.registration.response.RegistrationResponse
+import ru.an1s9n.odds.game.player.dto.registration.RegistrationRequestDto
+import ru.an1s9n.odds.game.player.dto.registration.RegistrationResponseDto
 import ru.an1s9n.odds.game.player.repository.Player
 import ru.an1s9n.odds.game.player.service.PlayerService
 import ru.an1s9n.odds.game.transaction.dto.TransactionType
@@ -30,16 +30,16 @@ class DefaultRegistrationService(
   private val registrationCents = gameProperties.registrationCredits * 100
 
   @Transactional
-  override suspend fun validateRequestAndRegister(registrationRequest: RegistrationRequest): RegistrationResponse {
-    log.info("incoming registration request: $registrationRequest")
-    validate(registrationRequest)
+  override suspend fun validateRequestAndRegister(registrationRequestDto: RegistrationRequestDto): RegistrationResponseDto {
+    log.info("incoming registration request: $registrationRequestDto")
+    validate(registrationRequestDto)
       ?.let { violations -> throw ResponseStatusException(HttpStatus.BAD_REQUEST, violations.joinToString()) }
 
     val player = playerService.add(
       Player(
-        username = registrationRequest.username.trim(),
-        firstName = registrationRequest.firstName.trim(),
-        lastName = registrationRequest.lastName.trim(),
+        username = registrationRequestDto.username.trim(),
+        firstName = registrationRequestDto.firstName.trim(),
+        lastName = registrationRequestDto.lastName.trim(),
         walletCents = registrationCents,
       ),
     )
@@ -52,21 +52,21 @@ class DefaultRegistrationService(
       ),
     )
 
-    return RegistrationResponse(player, BEARER_PREFIX + jwtService.createTokenWith(player.id))
+    return RegistrationResponseDto(player, BEARER_PREFIX + jwtService.createTokenWith(player.id))
       .also { log.info("new player successfully registered: $it") }
   }
 
-  private fun validate(registrationRequest: RegistrationRequest): List<String>? =
+  private fun validate(registrationRequestDto: RegistrationRequestDto): List<String>? =
     buildList {
-      if (registrationRequest.username.isBlank()) {
+      if (registrationRequestDto.username.isBlank()) {
         add("username can not be blank")
       }
-      if (registrationRequest.firstName.isBlank()) {
+      if (registrationRequestDto.firstName.isBlank()) {
         add("firstName can not be blank")
       }
-      if (registrationRequest.lastName.isBlank()) {
+      if (registrationRequestDto.lastName.isBlank()) {
         add("lastName can not be blank")
       }
     }.ifEmpty { null }
-      ?.also { log.info("registration request $registrationRequest is invalid: $it") }
+      ?.also { log.info("registration request $registrationRequestDto is invalid: $it") }
 }

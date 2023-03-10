@@ -1,4 +1,4 @@
-package ru.an1s9n.odds.game.game.prize
+package ru.an1s9n.odds.game.game.service.prize
 
 import org.springframework.stereotype.Service
 import ru.an1s9n.odds.game.config.properties.GameProperties

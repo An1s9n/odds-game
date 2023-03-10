@@ -1,4 +1,4 @@
-package ru.an1s9n.odds.game.player.registration.service
+package ru.an1s9n.odds.game.player.service.registration
 
 import com.ninjasquad.springmockk.MockkBean
 import com.ninjasquad.springmockk.SpykBean
@@ -13,12 +13,14 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.ComponentScan
+import org.springframework.context.annotation.FilterType
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.TestConstructor
 import org.springframework.web.server.ResponseStatusException
+import ru.an1s9n.odds.game.OddsGameApp
 import ru.an1s9n.odds.game.auth.jwt.JwtService
 import ru.an1s9n.odds.game.config.properties.GameProperties
-import ru.an1s9n.odds.game.player.registration.request.RegistrationRequest
+import ru.an1s9n.odds.game.player.dto.registration.RegistrationRequestDto
 import ru.an1s9n.odds.game.player.repository.Player
 import ru.an1s9n.odds.game.player.repository.PlayerRepository
 import ru.an1s9n.odds.game.player.service.PlayerService
@@ -51,7 +53,7 @@ internal class DefaultRegistrationServiceTest(
   internal fun `test player registration, ensure new player with correct wallet and registration bonus accrual persisted`() {
     runBlocking {
       defaultRegistrationService.validateRequestAndRegister(
-        RegistrationRequest(
+        RegistrationRequestDto(
           username = "An1s9n",
           firstName = "Pavel",
           lastName = "Anisimov",
@@ -80,7 +82,7 @@ internal class DefaultRegistrationServiceTest(
   internal fun `test player registration, ensure input trimmed`() {
     runBlocking {
       defaultRegistrationService.validateRequestAndRegister(
-        RegistrationRequest(
+        RegistrationRequestDto(
           username = "  An1s9n",
           firstName = "Pavel  ",
           lastName = "  Anisimov  ",
@@ -101,7 +103,7 @@ internal class DefaultRegistrationServiceTest(
     runBlocking {
       val e = assertThrows<ResponseStatusException> {
         defaultRegistrationService.validateRequestAndRegister(
-          RegistrationRequest(
+          RegistrationRequestDto(
             username = "An1s9n",
             firstName = "",
             lastName = " ",
@@ -127,7 +129,7 @@ internal class DefaultRegistrationServiceTest(
 
       val e = assertThrows<ResponseStatusException> {
         defaultRegistrationService.validateRequestAndRegister(
-          RegistrationRequest(
+          RegistrationRequestDto(
             username = "An1s9n",
             firstName = "Pavel",
             lastName = "Anisimov",
@@ -146,7 +148,7 @@ internal class DefaultRegistrationServiceTest(
     runBlocking {
       assertThrows<RuntimeException> {
         defaultRegistrationService.validateRequestAndRegister(
-          RegistrationRequest(
+          RegistrationRequestDto(
             username = "An1s9n",
             firstName = "Pavel",
             lastName = "Anisimov",
@@ -161,6 +163,19 @@ internal class DefaultRegistrationServiceTest(
 
   @TestConfiguration(proxyBeanMethods = false)
   @EnableConfigurationProperties(GameProperties::class)
-  @ComponentScan(basePackageClasses = [RegistrationService::class, PlayerService::class, TransactionService::class])
+  @ComponentScan(
+    basePackageClasses = [OddsGameApp::class],
+    useDefaultFilters = false,
+    includeFilters = [
+      ComponentScan.Filter(
+        type = FilterType.ASSIGNABLE_TYPE,
+        classes = [
+          PlayerService::class,
+          TransactionService::class,
+          RegistrationService::class,
+        ],
+      ),
+    ],
+  )
   internal class DefaultRegistrationServiceTestConfig
 }

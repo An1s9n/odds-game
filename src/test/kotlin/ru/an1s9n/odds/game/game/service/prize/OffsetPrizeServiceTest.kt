@@ -1,4 +1,4 @@
-package ru.an1s9n.odds.game.game.prize
+package ru.an1s9n.odds.game.game.service.prize
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.context.properties.EnableConfigurationProperties

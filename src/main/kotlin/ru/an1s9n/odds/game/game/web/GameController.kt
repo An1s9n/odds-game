@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import ru.an1s9n.odds.game.bet.dto.BetDto
-import ru.an1s9n.odds.game.game.model.request.PlayRequest
+import ru.an1s9n.odds.game.game.dto.PlayRequestDto
 import ru.an1s9n.odds.game.game.service.GameService
 import ru.an1s9n.odds.game.player.repository.Player
 
@@ -33,6 +33,6 @@ class GameController(
       ApiResponse(responseCode = "401", description = "invalid token", content = [Content()]),
     ],
   )
-  suspend fun play(@Parameter(hidden = true) player: Player, @RequestBody playRequest: PlayRequest): BetDto =
-    gameService.validateRequestAndPlay(player, playRequest)
+  suspend fun play(@Parameter(hidden = true) player: Player, @RequestBody playRequestDto: PlayRequestDto): BetDto =
+    gameService.validateRequestAndPlay(player, playRequestDto)
 }

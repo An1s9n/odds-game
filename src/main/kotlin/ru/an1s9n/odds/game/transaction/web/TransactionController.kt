@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import ru.an1s9n.odds.game.player.repository.Player
 import ru.an1s9n.odds.game.transaction.dto.TransactionDto
-import ru.an1s9n.odds.game.transaction.repository.Transaction
 import ru.an1s9n.odds.game.transaction.service.TransactionService
 
 @RestController
@@ -34,7 +33,7 @@ class TransactionController(
   @Operation(
     summary = "get transactions of currently authenticated player",
     responses = [
-      ApiResponse(responseCode = "200", description = "ok", content = [Content(array = ArraySchema(schema = Schema(implementation = Transaction::class)), mediaType = "application/json")]),
+      ApiResponse(responseCode = "200", description = "ok", content = [Content(array = ArraySchema(schema = Schema(implementation = TransactionDto::class)), mediaType = "application/json")]),
       ApiResponse(responseCode = "400", description = "invalid request", content = [Content()]),
       ApiResponse(responseCode = "401", description = "invalid token", content = [Content()]),
     ],

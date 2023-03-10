@@ -5,8 +5,8 @@ import org.springframework.transaction.annotation.Transactional
 import ru.an1s9n.odds.game.bet.dto.BetDto
 import ru.an1s9n.odds.game.bet.repository.Bet
 import ru.an1s9n.odds.game.bet.service.BetService
-import ru.an1s9n.odds.game.game.prize.PrizeService
-import ru.an1s9n.odds.game.game.range.GameRangeService
+import ru.an1s9n.odds.game.game.service.prize.PrizeService
+import ru.an1s9n.odds.game.game.service.range.GameRangeService
 import ru.an1s9n.odds.game.player.repository.Player
 import ru.an1s9n.odds.game.player.service.PlayerService
 import ru.an1s9n.odds.game.transaction.dto.TransactionType

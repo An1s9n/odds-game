@@ -8,10 +8,12 @@ import org.junit.jupiter.api.assertThrows
 import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.ComponentScan
+import org.springframework.context.annotation.FilterType
 import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.TestConstructor
 import org.springframework.web.server.ResponseStatusException
+import ru.an1s9n.odds.game.OddsGameApp
 import ru.an1s9n.odds.game.bet.repository.Bet
 import ru.an1s9n.odds.game.bet.repository.BetRepository
 import ru.an1s9n.odds.game.player.repository.Player
@@ -142,6 +144,15 @@ internal class DefaultPlayerServiceTest(
   }
 
   @TestConfiguration(proxyBeanMethods = false)
-  @ComponentScan(basePackageClasses = [PlayerService::class])
+  @ComponentScan(
+    basePackageClasses = [OddsGameApp::class],
+    useDefaultFilters = false,
+    includeFilters = [
+      ComponentScan.Filter(
+        type = FilterType.ASSIGNABLE_TYPE,
+        classes = [PlayerService::class],
+      ),
+    ],
+  )
   internal class DefaultPlayerServiceTestConfig
 }

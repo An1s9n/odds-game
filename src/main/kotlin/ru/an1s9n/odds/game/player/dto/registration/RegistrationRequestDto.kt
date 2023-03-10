@@ -1,8 +1,8 @@
-package ru.an1s9n.odds.game.player.registration.request
+package ru.an1s9n.odds.game.player.dto.registration
 
 import io.swagger.v3.oas.annotations.media.Schema
 
-data class RegistrationRequest(
+data class RegistrationRequestDto(
 
   @Schema(description = "may not be blank", example = "An1s9n")
   val username: String,

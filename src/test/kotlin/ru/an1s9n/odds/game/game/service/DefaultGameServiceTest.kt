@@ -19,14 +19,17 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.ComponentScan
+import org.springframework.context.annotation.FilterType
 import org.springframework.test.context.TestConstructor
 import org.springframework.web.server.ResponseStatusException
+import ru.an1s9n.odds.game.OddsGameApp
 import ru.an1s9n.odds.game.bet.repository.BetRepository
 import ru.an1s9n.odds.game.bet.service.BetService
 import ru.an1s9n.odds.game.config.properties.GameProperties
-import ru.an1s9n.odds.game.game.model.request.PlayRequest
-import ru.an1s9n.odds.game.game.prize.PrizeService
-import ru.an1s9n.odds.game.game.range.GameRangeService
+import ru.an1s9n.odds.game.game.dto.PlayRequestDto
+import ru.an1s9n.odds.game.game.service.prize.PrizeService
+import ru.an1s9n.odds.game.game.service.proxy.TransactionalProxyHelperGameService
+import ru.an1s9n.odds.game.game.service.range.GameRangeService
 import ru.an1s9n.odds.game.player.repository.Player
 import ru.an1s9n.odds.game.player.repository.PlayerRepository
 import ru.an1s9n.odds.game.player.service.PlayerService
@@ -65,9 +68,9 @@ internal class DefaultGameServiceTest(
   internal fun `test play, ensure transactions and bets created and user wallet updated correctly`() {
     runBlocking {
       val testPlayer = persistTestPlayer()
-      spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequest(betNumber = 130, betCredits = 2))
-      spyDefaultGameService.validateRequestAndPlay(playerRepository.findAll().first(), PlayRequest(betNumber = 129, betCredits = 3))
-      spyDefaultGameService.validateRequestAndPlay(playerRepository.findAll().first(), PlayRequest(betNumber = 128, betCredits = 6))
+      spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequestDto(betNumber = 130, betCredits = 2))
+      spyDefaultGameService.validateRequestAndPlay(playerRepository.findAll().first(), PlayRequestDto(betNumber = 129, betCredits = 3))
+      spyDefaultGameService.validateRequestAndPlay(playerRepository.findAll().first(), PlayRequestDto(betNumber = 128, betCredits = 6))
 
       assertEquals(100, playerRepository.findAll().first().walletCents)
 
@@ -105,7 +108,7 @@ internal class DefaultGameServiceTest(
       val testPlayer = persistTestPlayer()
 
       val e = assertThrows<ResponseStatusException> {
-        spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequest(betNumber = 130, betCredits = 6))
+        spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequestDto(betNumber = 130, betCredits = 6))
       }
       assertEquals("insufficient wallet: required 600 cents, on wallet 500 cents", e.reason)
     }
@@ -117,7 +120,7 @@ internal class DefaultGameServiceTest(
       val testPlayer = persistTestPlayer()
 
       val e = assertThrows<ResponseStatusException> {
-        spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequest(betNumber = 200, betCredits = 3))
+        spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequestDto(betNumber = 200, betCredits = 3))
       }
       assertEquals("betNumber 200 is out of 100..150 game range", e.reason)
     }
@@ -129,7 +132,7 @@ internal class DefaultGameServiceTest(
       val testPlayer = persistTestPlayer()
 
       val e = assertThrows<ResponseStatusException> {
-        spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequest(betNumber = 125, betCredits = -3))
+        spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequestDto(betNumber = 125, betCredits = -3))
       }
       assertEquals("betCredits must be grater than 0", e.reason)
     }
@@ -140,10 +143,10 @@ internal class DefaultGameServiceTest(
     runBlocking {
       val testPlayer = persistTestPlayer()
       val firstGame = launch {
-        spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequest(betNumber = 129, betCredits = 1))
+        spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequestDto(betNumber = 129, betCredits = 1))
       }
       val secondGame = launch {
-        spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequest(betNumber = 128, betCredits = 2))
+        spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequestDto(betNumber = 128, betCredits = 2))
       }
       listOf(firstGame, secondGame).forEach { it.join() }
 
@@ -178,11 +181,11 @@ internal class DefaultGameServiceTest(
     runBlocking {
       val testPlayer = persistTestPlayer()
       val firstGame = launch {
-        spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequest(betNumber = 128, betCredits = 5))
+        spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequestDto(betNumber = 128, betCredits = 5))
       }
       val secondGame = launch {
         val e = assertThrows<ResponseStatusException> {
-          spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequest(betNumber = 130, betCredits = 1))
+          spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequestDto(betNumber = 130, betCredits = 1))
         }
         assertEquals("insufficient wallet: required 100 cents, on wallet 0 cents", e.reason)
       }
@@ -215,11 +218,19 @@ internal class DefaultGameServiceTest(
   @TestConfiguration(proxyBeanMethods = false)
   @EnableConfigurationProperties(GameProperties::class)
   @ComponentScan(
-    basePackageClasses = [
-      GameService::class,
-      PlayerService::class,
-      TransactionService::class,
-      BetService::class,
+    basePackageClasses = [OddsGameApp::class],
+    useDefaultFilters = false,
+    includeFilters = [
+      ComponentScan.Filter(
+        type = FilterType.ASSIGNABLE_TYPE,
+        classes = [
+          GameService::class,
+          PlayerService::class,
+          TransactionService::class,
+          BetService::class,
+          TransactionalProxyHelperGameService::class,
+        ],
+      ),
     ],
   )
   internal class DefaultGameServiceTestConfig
