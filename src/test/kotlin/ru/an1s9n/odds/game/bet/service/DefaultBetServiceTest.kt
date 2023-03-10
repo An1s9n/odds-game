@@ -8,7 +8,8 @@ import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.test.context.TestConstructor
-import ru.an1s9n.odds.game.bet.model.Bet
+import ru.an1s9n.odds.game.bet.dto.BetDto
+import ru.an1s9n.odds.game.bet.repository.Bet
 import ru.an1s9n.odds.game.bet.repository.BetRepository
 import ru.an1s9n.odds.game.player.model.Player
 import ru.an1s9n.odds.game.player.repository.PlayerRepository
@@ -32,7 +33,7 @@ internal class DefaultBetServiceTest(
   internal fun `test add, ensure new bet added`() {
     runBlocking {
       val testPlayer = playerRepository.save(Player(username = "An1s9n", firstName = "Pavel", lastName = "Anisimov", walletCents = 0))
-      val addedBet = defaultBetService.add(Bet(playerId = testPlayer.id!!, timestampUtc = nowUtc(), betNumber = 0, betCents = 10, prizeNumber = 5, prizeCents = 20))
+      val addedBet = defaultBetService.add(BetDto(playerId = testPlayer.id!!, timestampUtc = nowUtc(), betNumber = 0, betCents = 10, prizeNumber = 5, prizeCents = 20))
 
       with(addedBet) {
         assertEquals(testPlayer.id, playerId)

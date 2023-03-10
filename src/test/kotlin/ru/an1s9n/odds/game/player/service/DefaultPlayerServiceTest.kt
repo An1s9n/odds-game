@@ -12,7 +12,7 @@ import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.TestConstructor
 import org.springframework.web.server.ResponseStatusException
-import ru.an1s9n.odds.game.bet.model.Bet
+import ru.an1s9n.odds.game.bet.repository.Bet
 import ru.an1s9n.odds.game.bet.repository.BetRepository
 import ru.an1s9n.odds.game.player.model.Player
 import ru.an1s9n.odds.game.player.repository.PlayerRepository

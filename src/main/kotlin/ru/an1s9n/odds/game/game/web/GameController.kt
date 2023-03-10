@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import ru.an1s9n.odds.game.bet.model.Bet
+import ru.an1s9n.odds.game.bet.dto.BetDto
 import ru.an1s9n.odds.game.game.model.request.PlayRequest
 import ru.an1s9n.odds.game.game.service.GameService
 import ru.an1s9n.odds.game.player.model.Player
@@ -28,11 +28,11 @@ class GameController(
   @Operation(
     summary = "bet on a number and play the game",
     responses = [
-      ApiResponse(responseCode = "200", description = "ok", content = [Content(schema = Schema(implementation = Bet::class), mediaType = "application/json")]),
+      ApiResponse(responseCode = "200", description = "ok", content = [Content(schema = Schema(implementation = BetDto::class), mediaType = "application/json")]),
       ApiResponse(responseCode = "400", description = "invalid playRequest", content = [Content()]),
       ApiResponse(responseCode = "401", description = "invalid token", content = [Content()]),
     ],
   )
-  suspend fun play(@Parameter(hidden = true) player: Player, @RequestBody playRequest: PlayRequest): Bet =
+  suspend fun play(@Parameter(hidden = true) player: Player, @RequestBody playRequest: PlayRequest): BetDto =
     gameService.validateRequestAndPlay(player, playRequest)
 }

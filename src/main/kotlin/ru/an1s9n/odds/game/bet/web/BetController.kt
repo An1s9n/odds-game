@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import ru.an1s9n.odds.game.bet.model.Bet
+import ru.an1s9n.odds.game.bet.dto.BetDto
 import ru.an1s9n.odds.game.bet.service.BetService
 import ru.an1s9n.odds.game.player.model.Player
 
@@ -33,7 +33,7 @@ class BetController(
   @Operation(
     summary = "get bets of currently authenticated player",
     responses = [
-      ApiResponse(responseCode = "200", description = "ok", content = [Content(array = ArraySchema(schema = Schema(implementation = Bet::class)), mediaType = "application/json")]),
+      ApiResponse(responseCode = "200", description = "ok", content = [Content(array = ArraySchema(schema = Schema(implementation = BetDto::class)), mediaType = "application/json")]),
       ApiResponse(responseCode = "400", description = "invalid request", content = [Content()]),
       ApiResponse(responseCode = "401", description = "invalid token", content = [Content()]),
     ],
@@ -47,5 +47,5 @@ class BetController(
     @Max(100)
     @RequestParam(name = "perPage", defaultValue = "20")
     perPage: Int,
-  ): Flow<Bet> = betService.findAllByPlayerFreshFirst(player, page, perPage)
+  ): Flow<BetDto> = betService.findAllByPlayerFreshFirst(player, page, perPage)
 }

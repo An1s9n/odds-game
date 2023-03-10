@@ -17,7 +17,7 @@ import reactor.core.publisher.Mono
 import ru.an1s9n.odds.game.auth.TEST_AUTH_HEADER
 import ru.an1s9n.odds.game.auth.TEST_AUTH_PLAYER_ID
 import ru.an1s9n.odds.game.auth.TEST_JWT_SECRET
-import ru.an1s9n.odds.game.bet.model.Bet
+import ru.an1s9n.odds.game.bet.dto.BetDto
 import ru.an1s9n.odds.game.config.SecurityConfig
 import ru.an1s9n.odds.game.game.model.request.PlayRequest
 import ru.an1s9n.odds.game.game.service.GameService
@@ -50,8 +50,8 @@ internal class GameControllerTest(
 
   @Test
   internal fun `ensure play endpoint works correctly`() {
-    val testBet = Bet(id = UUID.randomUUID(), playerId = testPlayer.id!!, timestampUtc = nowUtc(), betNumber = 10, betCents = 500, prizeNumber = 2, prizeCents = 0)
-    every { runBlocking { mockGameService.validateRequestAndPlay(testPlayer, testPlayRequest) } } returns testBet
+    val testBetDto = BetDto(id = UUID.randomUUID(), playerId = testPlayer.id!!, timestampUtc = nowUtc(), betNumber = 10, betCents = 500, prizeNumber = 2, prizeCents = 0)
+    every { runBlocking { mockGameService.validateRequestAndPlay(testPlayer, testPlayRequest) } } returns testBetDto
 
     webTestClient.post()
       .uri("/game/play")
@@ -60,7 +60,7 @@ internal class GameControllerTest(
       .exchange()
       .expectStatus().isOk
       .expectHeader().contentType(MediaType.APPLICATION_JSON)
-      .expectBody(Bet::class.java).isEqualTo(testBet)
+      .expectBody(BetDto::class.java).isEqualTo(testBetDto)
   }
 
   @Test

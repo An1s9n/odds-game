@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono
 import ru.an1s9n.odds.game.auth.TEST_AUTH_HEADER
 import ru.an1s9n.odds.game.auth.TEST_AUTH_PLAYER_ID
 import ru.an1s9n.odds.game.auth.TEST_JWT_SECRET
-import ru.an1s9n.odds.game.bet.model.Bet
+import ru.an1s9n.odds.game.bet.dto.BetDto
 import ru.an1s9n.odds.game.bet.service.BetService
 import ru.an1s9n.odds.game.config.SecurityConfig
 import ru.an1s9n.odds.game.player.model.Player
@@ -37,9 +37,9 @@ internal class BetControllerTest(
 
   private val testPlayer = Player(id = UUID.fromString(TEST_AUTH_PLAYER_ID), username = "An1s9n", firstName = "Pavel", lastName = "Anisimov", walletCents = 700)
 
-  private val testBet1 = Bet(playerId = testPlayer.id!!, timestampUtc = nowUtc(), betNumber = 0, betCents = 10, prizeNumber = 5, prizeCents = 50)
+  private val testBetDto1 = BetDto(playerId = testPlayer.id!!, timestampUtc = nowUtc(), betNumber = 0, betCents = 10, prizeNumber = 5, prizeCents = 50)
 
-  private val testBet2 = Bet(playerId = testPlayer.id!!, timestampUtc = nowUtc().minusMinutes(7), betNumber = 1, betCents = 5, prizeNumber = 7, prizeCents = 0)
+  private val testBetDto2 = BetDto(playerId = testPlayer.id!!, timestampUtc = nowUtc().minusMinutes(7), betNumber = 1, betCents = 5, prizeNumber = 7, prizeCents = 0)
 
   @BeforeEach
   internal fun initMocks() {
@@ -50,7 +50,7 @@ internal class BetControllerTest(
   @Test
   internal fun `ensure my endpoint works correctly`() {
     every { mockBetService.findAllByPlayerFreshFirst(testPlayer, 1, 20) } returns
-      flowOf(testBet1, testBet2)
+      flowOf(testBetDto1, testBetDto2)
 
     webTestClient.get()
       .uri("/bet/my")
@@ -58,12 +58,12 @@ internal class BetControllerTest(
       .exchange()
       .expectStatus().isOk
       .expectHeader().contentType(MediaType.APPLICATION_JSON)
-      .expectBodyList(Bet::class.java).hasSize(2).contains(testBet1).contains(testBet2)
+      .expectBodyList(BetDto::class.java).hasSize(2).contains(testBetDto1).contains(testBetDto2)
   }
 
   @Test
   internal fun `ensure my endpoint works correctly with user-specified pagination parameters`() {
-    every { mockBetService.findAllByPlayerFreshFirst(testPlayer, 3, 1) } returns flowOf(testBet2)
+    every { mockBetService.findAllByPlayerFreshFirst(testPlayer, 3, 1) } returns flowOf(testBetDto2)
 
     webTestClient.get()
       .uri("/bet/my?page=3&perPage=1")
@@ -71,7 +71,7 @@ internal class BetControllerTest(
       .exchange()
       .expectStatus().isOk
       .expectHeader().contentType(MediaType.APPLICATION_JSON)
-      .expectBodyList(Bet::class.java).hasSize(1).contains(testBet2)
+      .expectBodyList(BetDto::class.java).hasSize(1).contains(testBetDto2)
   }
 
   @Test

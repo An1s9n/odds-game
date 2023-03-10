@@ -5,7 +5,7 @@ import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
-import ru.an1s9n.odds.game.bet.model.Bet
+import ru.an1s9n.odds.game.bet.dto.BetDto
 import ru.an1s9n.odds.game.game.model.request.PlayRequest
 import ru.an1s9n.odds.game.game.range.GameRangeService
 import ru.an1s9n.odds.game.game.service.proxy.TransactionalProxyHelperGameService
@@ -21,7 +21,7 @@ class DefaultGameService(
 
   private val log = LoggerFactory.getLogger(this.javaClass)
 
-  override suspend fun validateRequestAndPlay(player: Player, playRequest: PlayRequest): Bet {
+  override suspend fun validateRequestAndPlay(player: Player, playRequest: PlayRequest): BetDto {
     log.info("incoming play request: $playRequest from player $player")
     validate(player, playRequest)
       ?.let { violations -> throw ResponseStatusException(HttpStatus.BAD_REQUEST, violations.joinToString()) }
