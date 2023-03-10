@@ -14,8 +14,8 @@ class DefaultTransactionService(
   private val transactionRepository: TransactionRepository,
 ) : TransactionService {
 
-  override suspend fun add(transactionDto: TransactionDto): TransactionDto =
-    transactionRepository.save(transactionDto.toEntity()).toDto()
+  override suspend fun add(transaction: Transaction): TransactionDto =
+    transactionRepository.save(transaction).toDto()
 
   override fun findAllByPlayerFreshFirst(player: Player, page: Int, perPage: Int): Flow<TransactionDto> =
     transactionRepository
@@ -23,14 +23,6 @@ class DefaultTransactionService(
       .map { it.toDto() }
 
   private fun Transaction.toDto() = TransactionDto(
-    id = id,
-    playerId = playerId,
-    timestampUtc = timestampUtc,
-    amountCents = amountCents,
-    type = type,
-  )
-
-  private fun TransactionDto.toEntity() = Transaction(
     id = id,
     playerId = playerId,
     timestampUtc = timestampUtc,

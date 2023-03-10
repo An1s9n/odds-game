@@ -3,10 +3,11 @@ package ru.an1s9n.odds.game.transaction.service
 import kotlinx.coroutines.flow.Flow
 import ru.an1s9n.odds.game.player.model.Player
 import ru.an1s9n.odds.game.transaction.dto.TransactionDto
+import ru.an1s9n.odds.game.transaction.repository.Transaction
 
 interface TransactionService {
 
-  suspend fun add(transactionDto: TransactionDto): TransactionDto
+  suspend fun add(transaction: Transaction): TransactionDto
 
   fun findAllByPlayerFreshFirst(player: Player, page: Int, perPage: Int): Flow<TransactionDto>
 }

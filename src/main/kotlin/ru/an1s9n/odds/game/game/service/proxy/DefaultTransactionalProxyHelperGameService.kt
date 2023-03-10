@@ -3,13 +3,14 @@ package ru.an1s9n.odds.game.game.service.proxy
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import ru.an1s9n.odds.game.bet.dto.BetDto
+import ru.an1s9n.odds.game.bet.repository.Bet
 import ru.an1s9n.odds.game.bet.service.BetService
 import ru.an1s9n.odds.game.game.prize.PrizeService
 import ru.an1s9n.odds.game.game.range.GameRangeService
 import ru.an1s9n.odds.game.player.model.Player
 import ru.an1s9n.odds.game.player.service.PlayerService
-import ru.an1s9n.odds.game.transaction.dto.TransactionDto
 import ru.an1s9n.odds.game.transaction.dto.TransactionType
+import ru.an1s9n.odds.game.transaction.repository.Transaction
 import ru.an1s9n.odds.game.transaction.service.TransactionService
 import ru.an1s9n.odds.game.util.nowUtc
 
@@ -25,7 +26,7 @@ class DefaultTransactionalProxyHelperGameService(
   @Transactional
   override suspend fun doPlay(player: Player, betNumber: Int, betCents: Long): BetDto {
     transactionService.add(
-      TransactionDto(
+      Transaction(
         playerId = player.id!!,
         timestampUtc = nowUtc(),
         amountCents = -betCents,
@@ -36,7 +37,7 @@ class DefaultTransactionalProxyHelperGameService(
     val prizeCents = prizeService.definePrizeCents(betNumber, prizeNumber, betCents)
     if (prizeCents > 0) {
       transactionService.add(
-        TransactionDto(
+        Transaction(
           playerId = player.id,
           timestampUtc = nowUtc(),
           amountCents = prizeCents,
@@ -46,7 +47,7 @@ class DefaultTransactionalProxyHelperGameService(
     }
     playerService.addToWallet(player, prizeCents - betCents)
     return betService.add(
-      BetDto(
+      Bet(
         playerId = player.id,
         timestampUtc = nowUtc(),
         betNumber = betNumber,
