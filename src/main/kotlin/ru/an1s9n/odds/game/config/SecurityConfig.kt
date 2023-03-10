@@ -40,6 +40,7 @@ class SecurityConfig(
       .authorizeExchange {
         it
           .pathMatchers(
+            "/actuator/**",
             "/player/register",
             "/player/top",
             "/swagger-ui.html",
