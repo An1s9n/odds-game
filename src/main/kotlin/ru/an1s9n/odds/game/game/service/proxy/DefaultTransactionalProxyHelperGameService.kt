@@ -8,8 +8,8 @@ import ru.an1s9n.odds.game.game.prize.PrizeService
 import ru.an1s9n.odds.game.game.range.GameRangeService
 import ru.an1s9n.odds.game.player.model.Player
 import ru.an1s9n.odds.game.player.service.PlayerService
-import ru.an1s9n.odds.game.transaction.model.Transaction
-import ru.an1s9n.odds.game.transaction.model.TransactionType
+import ru.an1s9n.odds.game.transaction.dto.TransactionDto
+import ru.an1s9n.odds.game.transaction.dto.TransactionType
 import ru.an1s9n.odds.game.transaction.service.TransactionService
 import ru.an1s9n.odds.game.util.nowUtc
 
@@ -25,7 +25,7 @@ class DefaultTransactionalProxyHelperGameService(
   @Transactional
   override suspend fun doPlay(player: Player, betNumber: Int, betCents: Long): BetDto {
     transactionService.add(
-      Transaction(
+      TransactionDto(
         playerId = player.id!!,
         timestampUtc = nowUtc(),
         amountCents = -betCents,
@@ -36,7 +36,7 @@ class DefaultTransactionalProxyHelperGameService(
     val prizeCents = prizeService.definePrizeCents(betNumber, prizeNumber, betCents)
     if (prizeCents > 0) {
       transactionService.add(
-        Transaction(
+        TransactionDto(
           playerId = player.id,
           timestampUtc = nowUtc(),
           amountCents = prizeCents,

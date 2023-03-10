@@ -30,7 +30,7 @@ import ru.an1s9n.odds.game.game.range.GameRangeService
 import ru.an1s9n.odds.game.player.model.Player
 import ru.an1s9n.odds.game.player.repository.PlayerRepository
 import ru.an1s9n.odds.game.player.service.PlayerService
-import ru.an1s9n.odds.game.transaction.model.TransactionType
+import ru.an1s9n.odds.game.transaction.dto.TransactionType
 import ru.an1s9n.odds.game.transaction.repository.TransactionRepository
 import ru.an1s9n.odds.game.transaction.service.TransactionService
 import ru.an1s9n.odds.game.util.sum

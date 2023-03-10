@@ -17,7 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import ru.an1s9n.odds.game.player.model.Player
-import ru.an1s9n.odds.game.transaction.model.Transaction
+import ru.an1s9n.odds.game.transaction.dto.TransactionDto
+import ru.an1s9n.odds.game.transaction.repository.Transaction
 import ru.an1s9n.odds.game.transaction.service.TransactionService
 
 @RestController
@@ -47,5 +48,5 @@ class TransactionController(
     @Max(100)
     @RequestParam(name = "perPage", defaultValue = "20")
     perPage: Int,
-  ): Flow<Transaction> = transactionService.findAllByPlayerFreshFirst(player, page, perPage)
+  ): Flow<TransactionDto> = transactionService.findAllByPlayerFreshFirst(player, page, perPage)
 }

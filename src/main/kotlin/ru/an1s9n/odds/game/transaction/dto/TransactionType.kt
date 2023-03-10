@@ -1,4 +1,4 @@
-package ru.an1s9n.odds.game.transaction.model
+package ru.an1s9n.odds.game.transaction.dto
 
 enum class TransactionType {
 

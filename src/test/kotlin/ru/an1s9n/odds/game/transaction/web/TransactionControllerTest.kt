@@ -17,8 +17,8 @@ import ru.an1s9n.odds.game.auth.TEST_AUTH_PLAYER_ID
 import ru.an1s9n.odds.game.auth.TEST_JWT_SECRET
 import ru.an1s9n.odds.game.config.SecurityConfig
 import ru.an1s9n.odds.game.player.model.Player
-import ru.an1s9n.odds.game.transaction.model.Transaction
-import ru.an1s9n.odds.game.transaction.model.TransactionType
+import ru.an1s9n.odds.game.transaction.dto.TransactionDto
+import ru.an1s9n.odds.game.transaction.dto.TransactionType
 import ru.an1s9n.odds.game.transaction.service.TransactionService
 import ru.an1s9n.odds.game.util.nowUtc
 import ru.an1s9n.odds.game.web.resolver.PlayerArgumentResolver
@@ -38,9 +38,9 @@ internal class TransactionControllerTest(
 
   private val testPlayer = Player(id = UUID.fromString(TEST_AUTH_PLAYER_ID), username = "An1s9n", firstName = "Pavel", lastName = "Anisimov", walletCents = 700)
 
-  private val testTransaction1 = Transaction(playerId = testPlayer.id!!, timestampUtc = nowUtc(), amountCents = 50, type = TransactionType.PRIZE)
+  private val testTransactionDto1 = TransactionDto(playerId = testPlayer.id!!, timestampUtc = nowUtc(), amountCents = 50, type = TransactionType.PRIZE)
 
-  private val testTransaction2 = Transaction(playerId = testPlayer.id!!, timestampUtc = nowUtc().minusMinutes(7), amountCents = -40, type = TransactionType.BET)
+  private val testTransactionDto2 = TransactionDto(playerId = testPlayer.id!!, timestampUtc = nowUtc().minusMinutes(7), amountCents = -40, type = TransactionType.BET)
 
   @BeforeEach
   internal fun initMocks() {
@@ -51,7 +51,7 @@ internal class TransactionControllerTest(
   @Test
   internal fun `ensure my endpoint works correctly`() {
     every { mockTransactionService.findAllByPlayerFreshFirst(testPlayer, 1, 20) } returns
-      flowOf(testTransaction1, testTransaction2)
+      flowOf(testTransactionDto1, testTransactionDto2)
 
     webTestClient.get()
       .uri("/transaction/my")
@@ -59,13 +59,13 @@ internal class TransactionControllerTest(
       .exchange()
       .expectStatus().isOk
       .expectHeader().contentType(MediaType.APPLICATION_JSON)
-      .expectBodyList(Transaction::class.java).hasSize(2).contains(testTransaction1).contains(testTransaction2)
+      .expectBodyList(TransactionDto::class.java).hasSize(2).contains(testTransactionDto1).contains(testTransactionDto2)
   }
 
   @Test
   internal fun `ensure my endpoint works correctly with user-specified pagination parameters`() {
     every { mockTransactionService.findAllByPlayerFreshFirst(testPlayer, 3, 1) } returns
-      flowOf(testTransaction2)
+      flowOf(testTransactionDto2)
 
     webTestClient.get()
       .uri("/transaction/my?page=3&perPage=1")
@@ -73,7 +73,7 @@ internal class TransactionControllerTest(
       .exchange()
       .expectStatus().isOk
       .expectHeader().contentType(MediaType.APPLICATION_JSON)
-      .expectBodyList(Transaction::class.java).hasSize(1).contains(testTransaction2)
+      .expectBodyList(TransactionDto::class.java).hasSize(1).contains(testTransactionDto2)
   }
 
   @Test

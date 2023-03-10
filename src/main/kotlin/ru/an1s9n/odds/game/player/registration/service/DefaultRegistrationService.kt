@@ -12,8 +12,8 @@ import ru.an1s9n.odds.game.player.model.Player
 import ru.an1s9n.odds.game.player.registration.request.RegistrationRequest
 import ru.an1s9n.odds.game.player.registration.response.RegistrationResponse
 import ru.an1s9n.odds.game.player.service.PlayerService
-import ru.an1s9n.odds.game.transaction.model.Transaction
-import ru.an1s9n.odds.game.transaction.model.TransactionType
+import ru.an1s9n.odds.game.transaction.dto.TransactionDto
+import ru.an1s9n.odds.game.transaction.dto.TransactionType
 import ru.an1s9n.odds.game.transaction.service.TransactionService
 import ru.an1s9n.odds.game.util.nowUtc
 
@@ -44,7 +44,7 @@ class DefaultRegistrationService(
       ),
     )
     transactionService.add(
-      Transaction(
+      TransactionDto(
         playerId = player.id!!,
         timestampUtc = nowUtc(),
         amountCents = registrationCents,

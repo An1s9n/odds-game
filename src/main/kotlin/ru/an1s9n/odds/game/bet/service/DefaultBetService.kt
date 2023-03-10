@@ -14,7 +14,7 @@ class DefaultBetService(
   private val betRepository: BetRepository,
 ) : BetService {
 
-  override suspend fun add(bet: BetDto): BetDto = betRepository.save(bet.toEntity()).toDto()
+  override suspend fun add(betDto: BetDto): BetDto = betRepository.save(betDto.toEntity()).toDto()
 
   override fun findAllByPlayerFreshFirst(player: Player, page: Int, perPage: Int): Flow<BetDto> =
     betRepository.findAllByPlayerIdOrderByTimestampUtcDesc(player.id!!, PageRequest.of(page - 1, perPage))

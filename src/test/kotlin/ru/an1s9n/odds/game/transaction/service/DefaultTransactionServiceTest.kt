@@ -10,8 +10,9 @@ import org.springframework.context.annotation.ComponentScan
 import org.springframework.test.context.TestConstructor
 import ru.an1s9n.odds.game.player.model.Player
 import ru.an1s9n.odds.game.player.repository.PlayerRepository
-import ru.an1s9n.odds.game.transaction.model.Transaction
-import ru.an1s9n.odds.game.transaction.model.TransactionType
+import ru.an1s9n.odds.game.transaction.dto.TransactionDto
+import ru.an1s9n.odds.game.transaction.dto.TransactionType
+import ru.an1s9n.odds.game.transaction.repository.Transaction
 import ru.an1s9n.odds.game.transaction.repository.TransactionRepository
 import ru.an1s9n.odds.game.util.nowUtc
 import kotlin.test.assertEquals
@@ -33,7 +34,7 @@ internal class DefaultTransactionServiceTest(
   internal fun `test add, ensure new transaction added`() {
     runBlocking {
       val testPlayer = playerRepository.save(Player(username = "An1s9n", firstName = "Pavel", lastName = "Anisimov", walletCents = 0))
-      val addedTransaction = defaultTransactionService.add(Transaction(playerId = testPlayer.id!!, timestampUtc = nowUtc(), amountCents = 10, type = TransactionType.PRIZE))
+      val addedTransaction = defaultTransactionService.add(TransactionDto(playerId = testPlayer.id!!, timestampUtc = nowUtc(), amountCents = 10, type = TransactionType.PRIZE))
 
       with(addedTransaction) {
         assertEquals(testPlayer.id, playerId)

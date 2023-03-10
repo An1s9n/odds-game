@@ -6,7 +6,7 @@ import ru.an1s9n.odds.game.player.model.Player
 
 interface BetService {
 
-  suspend fun add(bet: BetDto): BetDto
+  suspend fun add(betDto: BetDto): BetDto
 
   fun findAllByPlayerFreshFirst(player: Player, page: Int, perPage: Int): Flow<BetDto>
 }
