@@ -5,14 +5,11 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
-import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
-import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import ru.an1s9n.odds.game.player.registration.exception.UsernameAlreadyTakenException
 import ru.an1s9n.odds.game.player.registration.request.RegistrationRequest
 import ru.an1s9n.odds.game.player.registration.response.RegistrationResponse
 import ru.an1s9n.odds.game.player.registration.service.RegistrationService
@@ -34,11 +31,4 @@ class PlayerRegistrationController(
   )
   suspend fun register(@RequestBody registrationRequest: RegistrationRequest): RegistrationResponse =
     registrationService.validateRequestAndRegister(registrationRequest)
-
-  @ExceptionHandler
-  suspend fun handleUsernameAlreadyTaken(e: UsernameAlreadyTakenException): ProblemDetail =
-    ProblemDetail.forStatus(HttpStatus.BAD_REQUEST).apply {
-      title = UsernameAlreadyTakenException::class.simpleName
-      detail = e.message
-    }
 }

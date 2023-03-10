@@ -1,3 +1,7 @@
+server:
+  error:
+    include-message: "always"
+
 spring:
   webflux:
     base-path: "/api/v1"

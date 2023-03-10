@@ -2,9 +2,10 @@ package ru.an1s9n.odds.game.player.service
 
 import kotlinx.coroutines.flow.Flow
 import org.springframework.dao.DuplicateKeyException
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import org.springframework.web.server.ResponseStatusException
 import ru.an1s9n.odds.game.player.model.Player
-import ru.an1s9n.odds.game.player.registration.exception.UsernameAlreadyTakenException
 import ru.an1s9n.odds.game.player.repository.PlayerRepository
 import ru.an1s9n.odds.game.player.top.response.PlayerTopProjection
 import java.util.UUID
@@ -20,7 +21,7 @@ class DefaultPlayerService(
     try {
       playerRepository.save(player)
     } catch (e: DuplicateKeyException) {
-      throw UsernameAlreadyTakenException(player.username)
+      throw ResponseStatusException(HttpStatus.BAD_REQUEST, "username ${player.username} is already taken")
     }
 
   override suspend fun addToWallet(player: Player, addCents: Long): Player {

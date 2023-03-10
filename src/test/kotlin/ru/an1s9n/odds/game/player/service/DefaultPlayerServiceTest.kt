@@ -9,11 +9,12 @@ import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.dao.OptimisticLockingFailureException
+import org.springframework.http.HttpStatus
 import org.springframework.test.context.TestConstructor
+import org.springframework.web.server.ResponseStatusException
 import ru.an1s9n.odds.game.bet.model.Bet
 import ru.an1s9n.odds.game.bet.repository.BetRepository
 import ru.an1s9n.odds.game.player.model.Player
-import ru.an1s9n.odds.game.player.registration.exception.UsernameAlreadyTakenException
 import ru.an1s9n.odds.game.player.repository.PlayerRepository
 import ru.an1s9n.odds.game.util.nowUtc
 import java.util.UUID
@@ -66,14 +67,15 @@ internal class DefaultPlayerServiceTest(
   }
 
   @Test
-  internal fun `test add when player with such username exists, ensure UsernameAlreadyTakenException thrown`() {
+  internal fun `test add when player with such username exists, ensure bad request ResponseStatusException thrown`() {
     runBlocking {
       playerRepository.save(Player(username = "An1s9n", firstName = "Fedor", lastName = "Fedorov", walletCents = 0))
 
-      val e = assertThrows<UsernameAlreadyTakenException> {
+      val e = assertThrows<ResponseStatusException> {
         defaultPlayerService.add(Player(username = "An1s9n", firstName = "Pavel", lastName = "Anisimov", walletCents = 0))
       }
-      assertEquals("username An1s9n is already taken", e.message)
+      assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
+      assertEquals("username An1s9n is already taken", e.reason)
     }
   }
 

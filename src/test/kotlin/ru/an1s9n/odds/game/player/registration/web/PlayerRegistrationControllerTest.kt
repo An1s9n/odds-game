@@ -6,12 +6,13 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.context.annotation.Import
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.test.context.TestConstructor
 import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.web.server.ResponseStatusException
 import ru.an1s9n.odds.game.config.SecurityConfig
 import ru.an1s9n.odds.game.player.model.Player
-import ru.an1s9n.odds.game.player.registration.exception.UsernameAlreadyTakenException
 import ru.an1s9n.odds.game.player.registration.request.RegistrationRequest
 import ru.an1s9n.odds.game.player.registration.response.RegistrationResponse
 import ru.an1s9n.odds.game.player.registration.service.RegistrationService
@@ -47,17 +48,17 @@ internal class PlayerRegistrationControllerTest(
   }
 
   @Test
-  internal fun `ensure registration endpoint returns 400 in case of UsernameAlreadyTakenException`() {
+  internal fun `ensure registration endpoint returns 400 if username is already taken`() {
     every { runBlocking { mockRegistrationService.validateRequestAndRegister(testRegistrationRequest) } } throws
-      UsernameAlreadyTakenException("An1s9n")
+      ResponseStatusException(HttpStatus.BAD_REQUEST, "username An1s9n is already taken")
 
     webTestClient.post()
       .uri("/player/register")
       .bodyValue(testRegistrationRequest)
       .exchange()
       .expectStatus().isBadRequest
-      .expectHeader().contentType(MediaType.APPLICATION_PROBLEM_JSON)
-      .expectBody().jsonPath("$.title").isEqualTo("UsernameAlreadyTakenException")
+      .expectHeader().contentType(MediaType.APPLICATION_JSON)
+      .expectBody().jsonPath("$.message").isEqualTo("username An1s9n is already taken")
   }
 
   @Test

@@ -13,11 +13,12 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.ComponentScan
+import org.springframework.http.HttpStatus
 import org.springframework.test.context.TestConstructor
+import org.springframework.web.server.ResponseStatusException
 import ru.an1s9n.odds.game.auth.jwt.JwtService
 import ru.an1s9n.odds.game.config.properties.GameProperties
 import ru.an1s9n.odds.game.player.model.Player
-import ru.an1s9n.odds.game.player.registration.exception.UsernameAlreadyTakenException
 import ru.an1s9n.odds.game.player.registration.request.RegistrationRequest
 import ru.an1s9n.odds.game.player.repository.PlayerRepository
 import ru.an1s9n.odds.game.player.service.PlayerService
@@ -114,7 +115,7 @@ internal class DefaultRegistrationServiceTest(
   }
 
   @Test
-  internal fun `test player registration when username is already taken, ensure UsernameAlreadyTakenException thrown`() {
+  internal fun `test player registration when username is already taken, ensure bad request ResponseStatusException thrown`() {
     runBlocking {
       playerRepository.save(
         Player(
@@ -125,7 +126,7 @@ internal class DefaultRegistrationServiceTest(
         ),
       )
 
-      assertThrows<UsernameAlreadyTakenException> {
+      val e = assertThrows<ResponseStatusException> {
         defaultRegistrationService.validateRequestAndRegister(
           RegistrationRequest(
             username = "An1s9n",
@@ -134,6 +135,8 @@ internal class DefaultRegistrationServiceTest(
           ),
         )
       }
+      assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
+      assertEquals("username An1s9n is already taken", e.reason)
     }
   }
 
