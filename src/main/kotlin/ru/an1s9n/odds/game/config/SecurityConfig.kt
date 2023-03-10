@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus
+import org.springframework.security.authentication.ReactiveAuthenticationManager
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder
 import org.springframework.security.config.web.server.ServerHttpSecurity
 import org.springframework.security.web.server.SecurityWebFilterChain
@@ -36,21 +37,26 @@ class SecurityConfig(
       .httpBasic { it.authenticationEntryPoint(HttpStatusServerEntryPoint(HttpStatus.UNAUTHORIZED)) }
       .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
       .addFilterAt(bearerAuthenticationWebFilter(), SecurityWebFiltersOrder.AUTHENTICATION)
-      .authorizeExchange { it
-        .pathMatchers(
-          "/player/register",
-          "/player/top",
-          "/swagger-ui.html",
-          "/v3/api-docs/**",
-          "/webjars/swagger-ui/**"
-        ).permitAll()
-        .anyExchange().authenticated()
+      .authorizeExchange {
+        it
+          .pathMatchers(
+            "/player/register",
+            "/player/top",
+            "/swagger-ui.html",
+            "/v3/api-docs/**",
+            "/webjars/swagger-ui/**",
+          ).permitAll()
+          .anyExchange().authenticated()
       }
       .build()
 
   @Bean
   fun jwtService(): JwtService = Auth0JwtService(jwtSecret)
 
+  @Bean
+  fun bearerReactiveAuthenticationManager(): ReactiveAuthenticationManager =
+    BearerReactiveAuthenticationManager(jwtService())
+
   private fun bearerAuthenticationWebFilter(): AuthenticationWebFilter =
-    BearerAuthenticationWebFilter(BearerReactiveAuthenticationManager(jwtService()))
+    BearerAuthenticationWebFilter(bearerReactiveAuthenticationManager())
 }

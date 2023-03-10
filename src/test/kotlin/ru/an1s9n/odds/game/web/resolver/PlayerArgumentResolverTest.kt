@@ -9,6 +9,7 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.core.MethodParameter
+import org.springframework.http.HttpStatus
 import org.springframework.mock.http.server.reactive.MockServerHttpRequest
 import org.springframework.mock.web.server.MockServerWebExchange
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -16,6 +17,7 @@ import org.springframework.security.core.authority.AuthorityUtils
 import org.springframework.security.core.context.ReactiveSecurityContextHolder
 import org.springframework.security.core.context.SecurityContextImpl
 import org.springframework.web.reactive.BindingContext
+import org.springframework.web.server.ResponseStatusException
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
 import ru.an1s9n.odds.game.player.model.Player
@@ -70,11 +72,11 @@ internal class PlayerArgumentResolverTest {
         BindingContext(),
         MockServerWebExchange.builder(MockServerHttpRequest.get("mock-url")).build(),
       ),
-    ).expectNext(testPlayer).expectComplete().verify()
+    ).expectNext(testPlayer).verifyComplete()
   }
 
   @Test
-  internal fun `ensure IllegalStateException thrown if securityContext missing`() {
+  internal fun `ensure unauthorized exception thrown if securityContext missing`() {
     every { ReactiveSecurityContextHolder.getContext() } returns Mono.empty()
 
     StepVerifier.create(
@@ -83,11 +85,11 @@ internal class PlayerArgumentResolverTest {
         BindingContext(),
         MockServerWebExchange.builder(MockServerHttpRequest.get("mock-url")).build(),
       ),
-    ).expectError(IllegalStateException::class.java).verify()
+    ).verifyErrorMatches { it is ResponseStatusException && it.statusCode == HttpStatus.UNAUTHORIZED }
   }
 
   @Test
-  internal fun `ensure IllegalStateException thrown if authentication missing`() {
+  internal fun `ensure unauthorized exception thrown if authentication missing`() {
     every { ReactiveSecurityContextHolder.getContext() } returns Mono.just(SecurityContextImpl())
 
     StepVerifier.create(
@@ -96,11 +98,11 @@ internal class PlayerArgumentResolverTest {
         BindingContext(),
         MockServerWebExchange.builder(MockServerHttpRequest.get("mock-url")).build(),
       ),
-    ).expectError(IllegalStateException::class.java).verify()
+    ).verifyErrorMatches { it is ResponseStatusException && it.statusCode == HttpStatus.UNAUTHORIZED }
   }
 
   @Test
-  internal fun `ensure IllegalStateException thrown if player is not authenticated`() {
+  internal fun `ensure unauthorized exception thrown if player is not authenticated`() {
     every { ReactiveSecurityContextHolder.getContext() } returns
       Mono.just(
         SecurityContextImpl().apply {
@@ -118,11 +120,11 @@ internal class PlayerArgumentResolverTest {
         BindingContext(),
         MockServerWebExchange.builder(MockServerHttpRequest.get("mock-url")).build(),
       ),
-    ).expectError(IllegalStateException::class.java).verify()
+    ).verifyErrorMatches { it is ResponseStatusException && it.statusCode == HttpStatus.UNAUTHORIZED }
   }
 
   @Test
-  internal fun `ensure IllegalStateException thrown if principal is not a valid UUID`() {
+  internal fun `ensure unauthorized exception thrown if principal is not a valid UUID`() {
     every { ReactiveSecurityContextHolder.getContext() } returns
       Mono.just(
         SecurityContextImpl().apply {
@@ -140,11 +142,11 @@ internal class PlayerArgumentResolverTest {
         BindingContext(),
         MockServerWebExchange.builder(MockServerHttpRequest.get("mock-url")).build(),
       ),
-    ).expectError(IllegalStateException::class.java).verify()
+    ).verifyErrorMatches { it is ResponseStatusException && it.statusCode == HttpStatus.UNAUTHORIZED }
   }
 
   @Test
-  internal fun `ensure IllegalStateException thrown if player not exists`() {
+  internal fun `ensure unauthorized exception thrown if player not exists`() {
     every { ReactiveSecurityContextHolder.getContext() } returns
       Mono.just(
         SecurityContextImpl().apply {
@@ -163,7 +165,7 @@ internal class PlayerArgumentResolverTest {
         BindingContext(),
         MockServerWebExchange.builder(MockServerHttpRequest.get("mock-url")).build(),
       ),
-    ).expectError(IllegalStateException::class.java).verify()
+    ).verifyErrorMatches { it is ResponseStatusException && it.statusCode == HttpStatus.UNAUTHORIZED }
   }
 
   private fun funWithPlayerArg(@Suppress("unused_parameter") player: Player) {
