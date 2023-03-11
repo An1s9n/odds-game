@@ -51,7 +51,7 @@ internal class GameControllerTest(
   @Test
   internal fun `ensure play endpoint works correctly`() {
     val testBetDto = BetDto(id = UUID.randomUUID(), playerId = testPlayer.id!!, timestampUtc = nowUtc(), betNumber = 10, betCents = 500, prizeNumber = 2, prizeCents = 0)
-    every { runBlocking { mockGameService.validateRequestAndPlay(testPlayer, testPlayRequestDto) } } returns testBetDto
+    every { runBlocking { mockGameService.play(testPlayer, testPlayRequestDto) } } returns testBetDto
 
     webTestClient.post()
       .uri("/game/play")
@@ -65,7 +65,7 @@ internal class GameControllerTest(
 
   @Test
   internal fun `ensure play endpoint returns 400 in case of invalid request ResponseStatusException`() {
-    every { runBlocking { mockGameService.validateRequestAndPlay(testPlayer, testPlayRequestDto) } } throws
+    every { runBlocking { mockGameService.play(testPlayer, testPlayRequestDto) } } throws
       ResponseStatusException(HttpStatus.BAD_REQUEST, "some-message")
 
     webTestClient.post()

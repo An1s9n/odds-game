@@ -6,5 +6,5 @@ import ru.an1s9n.oddsgame.player.repository.Player
 
 interface GameService {
 
-  suspend fun validateRequestAndPlay(player: Player, playRequestDto: PlayRequestDto): BetDto
+  suspend fun play(player: Player, playRequestDto: PlayRequestDto): BetDto
 }

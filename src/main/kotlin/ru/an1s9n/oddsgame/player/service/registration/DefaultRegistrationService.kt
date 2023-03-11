@@ -30,7 +30,7 @@ class DefaultRegistrationService(
   private val registrationCents = gameProperties.registrationCredits * 100
 
   @Transactional
-  override suspend fun validateRequestAndRegister(registrationRequestDto: RegistrationRequestDto): RegistrationResponseDto {
+  override suspend fun register(registrationRequestDto: RegistrationRequestDto): RegistrationResponseDto {
     log.info("incoming registration request: $registrationRequestDto")
     validate(registrationRequestDto)
       ?.let { violations -> throw ResponseStatusException(HttpStatus.BAD_REQUEST, violations.joinToString()) }

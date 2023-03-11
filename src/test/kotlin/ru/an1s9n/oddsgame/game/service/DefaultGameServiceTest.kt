@@ -68,9 +68,9 @@ internal class DefaultGameServiceTest(
   internal fun `test play, ensure transactions and bets created and user wallet updated correctly`() {
     runBlocking {
       val testPlayer = persistTestPlayer()
-      spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequestDto(betNumber = 130, betCredits = 2))
-      spyDefaultGameService.validateRequestAndPlay(playerRepository.findAll().first(), PlayRequestDto(betNumber = 129, betCredits = 3))
-      spyDefaultGameService.validateRequestAndPlay(playerRepository.findAll().first(), PlayRequestDto(betNumber = 128, betCredits = 6))
+      spyDefaultGameService.play(testPlayer, PlayRequestDto(betNumber = 130, betCredits = 2))
+      spyDefaultGameService.play(playerRepository.findAll().first(), PlayRequestDto(betNumber = 129, betCredits = 3))
+      spyDefaultGameService.play(playerRepository.findAll().first(), PlayRequestDto(betNumber = 128, betCredits = 6))
 
       assertEquals(100, playerRepository.findAll().first().walletCents)
 
@@ -108,7 +108,7 @@ internal class DefaultGameServiceTest(
       val testPlayer = persistTestPlayer()
 
       val e = assertThrows<ResponseStatusException> {
-        spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequestDto(betNumber = 130, betCredits = 6))
+        spyDefaultGameService.play(testPlayer, PlayRequestDto(betNumber = 130, betCredits = 6))
       }
       assertEquals("insufficient wallet: required 600 cents, on wallet 500 cents", e.reason)
     }
@@ -120,7 +120,7 @@ internal class DefaultGameServiceTest(
       val testPlayer = persistTestPlayer()
 
       val e = assertThrows<ResponseStatusException> {
-        spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequestDto(betNumber = 200, betCredits = 3))
+        spyDefaultGameService.play(testPlayer, PlayRequestDto(betNumber = 200, betCredits = 3))
       }
       assertEquals("betNumber 200 is out of 100..150 game range", e.reason)
     }
@@ -132,7 +132,7 @@ internal class DefaultGameServiceTest(
       val testPlayer = persistTestPlayer()
 
       val e = assertThrows<ResponseStatusException> {
-        spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequestDto(betNumber = 125, betCredits = -3))
+        spyDefaultGameService.play(testPlayer, PlayRequestDto(betNumber = 125, betCredits = -3))
       }
       assertEquals("betCredits must be grater than 0", e.reason)
     }
@@ -143,10 +143,10 @@ internal class DefaultGameServiceTest(
     runBlocking {
       val testPlayer = persistTestPlayer()
       val firstGame = launch {
-        spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequestDto(betNumber = 129, betCredits = 1))
+        spyDefaultGameService.play(testPlayer, PlayRequestDto(betNumber = 129, betCredits = 1))
       }
       val secondGame = launch {
-        spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequestDto(betNumber = 128, betCredits = 2))
+        spyDefaultGameService.play(testPlayer, PlayRequestDto(betNumber = 128, betCredits = 2))
       }
       listOf(firstGame, secondGame).forEach { it.join() }
 
@@ -172,7 +172,7 @@ internal class DefaultGameServiceTest(
         assertEquals(0, prizeCents)
       }
 
-      verify(exactly = 3) { runBlocking { spyDefaultGameService.validateRequestAndPlay(any(), any()) } }
+      verify(exactly = 3) { runBlocking { spyDefaultGameService.play(any(), any()) } }
     }
   }
 
@@ -181,11 +181,11 @@ internal class DefaultGameServiceTest(
     runBlocking {
       val testPlayer = persistTestPlayer()
       val firstGame = launch {
-        spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequestDto(betNumber = 128, betCredits = 5))
+        spyDefaultGameService.play(testPlayer, PlayRequestDto(betNumber = 128, betCredits = 5))
       }
       val secondGame = launch {
         val e = assertThrows<ResponseStatusException> {
-          spyDefaultGameService.validateRequestAndPlay(testPlayer, PlayRequestDto(betNumber = 130, betCredits = 1))
+          spyDefaultGameService.play(testPlayer, PlayRequestDto(betNumber = 130, betCredits = 1))
         }
         assertEquals("insufficient wallet: required 100 cents, on wallet 0 cents", e.reason)
       }
@@ -208,7 +208,7 @@ internal class DefaultGameServiceTest(
         assertEquals(0, prizeCents)
       }
 
-      verify(exactly = 3) { runBlocking { spyDefaultGameService.validateRequestAndPlay(any(), any()) } }
+      verify(exactly = 3) { runBlocking { spyDefaultGameService.play(any(), any()) } }
     }
   }
 

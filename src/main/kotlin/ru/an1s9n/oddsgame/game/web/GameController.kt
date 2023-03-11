@@ -34,5 +34,5 @@ class GameController(
     ],
   )
   suspend fun play(@Parameter(hidden = true) player: Player, @RequestBody playRequestDto: PlayRequestDto): BetDto =
-    gameService.validateRequestAndPlay(player, playRequestDto)
+    gameService.play(player, playRequestDto)
 }

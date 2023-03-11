@@ -48,7 +48,7 @@ internal class PlayerControllerTest(
       playerDto = PlayerDto(id = UUID.randomUUID(), username = "An1s9n", firstName = "Pavel", lastName = "Anisimov", walletCents = 5),
       token = "mock-token",
     )
-    every { runBlocking { mockRegistrationService.validateRequestAndRegister(testRegistrationRequestDto) } } returns
+    every { runBlocking { mockRegistrationService.register(testRegistrationRequestDto) } } returns
       testRegistrationResponseDto
 
     webTestClient.post()
@@ -62,7 +62,7 @@ internal class PlayerControllerTest(
 
   @Test
   internal fun `ensure registration endpoint returns 400 if username is already taken`() {
-    every { runBlocking { mockRegistrationService.validateRequestAndRegister(testRegistrationRequestDto) } } throws
+    every { runBlocking { mockRegistrationService.register(testRegistrationRequestDto) } } throws
       ResponseStatusException(HttpStatus.BAD_REQUEST, "username An1s9n is already taken")
 
     webTestClient.post()
@@ -76,7 +76,7 @@ internal class PlayerControllerTest(
 
   @Test
   internal fun `ensure registration endpoint returns 400 in case of invalid request ResponseStatusException`() {
-    every { runBlocking { mockRegistrationService.validateRequestAndRegister(testRegistrationRequestDto) } } throws
+    every { runBlocking { mockRegistrationService.register(testRegistrationRequestDto) } } throws
       ResponseStatusException(HttpStatus.BAD_REQUEST, "some-message")
 
     webTestClient.post()

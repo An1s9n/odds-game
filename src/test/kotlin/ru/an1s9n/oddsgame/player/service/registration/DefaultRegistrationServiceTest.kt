@@ -52,7 +52,7 @@ internal class DefaultRegistrationServiceTest(
   @Test
   internal fun `test player registration, ensure new player with correct wallet and registration bonus accrual persisted`() {
     runBlocking {
-      defaultRegistrationService.validateRequestAndRegister(
+      defaultRegistrationService.register(
         RegistrationRequestDto(
           username = "An1s9n",
           firstName = "Pavel",
@@ -81,7 +81,7 @@ internal class DefaultRegistrationServiceTest(
   @Test
   internal fun `test player registration, ensure input trimmed`() {
     runBlocking {
-      defaultRegistrationService.validateRequestAndRegister(
+      defaultRegistrationService.register(
         RegistrationRequestDto(
           username = "  An1s9n",
           firstName = "Pavel  ",
@@ -102,7 +102,7 @@ internal class DefaultRegistrationServiceTest(
   internal fun `test player registration when input contains blank fields, ensure invalid request ResponseStatusException thrown`() {
     runBlocking {
       val e = assertThrows<ResponseStatusException> {
-        defaultRegistrationService.validateRequestAndRegister(
+        defaultRegistrationService.register(
           RegistrationRequestDto(
             username = "An1s9n",
             firstName = "",
@@ -128,7 +128,7 @@ internal class DefaultRegistrationServiceTest(
       )
 
       val e = assertThrows<ResponseStatusException> {
-        defaultRegistrationService.validateRequestAndRegister(
+        defaultRegistrationService.register(
           RegistrationRequestDto(
             username = "An1s9n",
             firstName = "Pavel",
@@ -147,7 +147,7 @@ internal class DefaultRegistrationServiceTest(
 
     runBlocking {
       assertThrows<RuntimeException> {
-        defaultRegistrationService.validateRequestAndRegister(
+        defaultRegistrationService.register(
           RegistrationRequestDto(
             username = "An1s9n",
             firstName = "Pavel",

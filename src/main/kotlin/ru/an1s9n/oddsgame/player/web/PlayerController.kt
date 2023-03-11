@@ -44,7 +44,7 @@ class PlayerController(
     ],
   )
   suspend fun register(@RequestBody registrationRequestDto: RegistrationRequestDto): RegistrationResponseDto =
-    registrationService.validateRequestAndRegister(registrationRequestDto)
+    registrationService.register(registrationRequestDto)
 
   @GetMapping("/me")
   @SecurityRequirement(name = "JWT Authorization")

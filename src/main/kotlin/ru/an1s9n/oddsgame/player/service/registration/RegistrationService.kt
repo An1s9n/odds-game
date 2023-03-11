@@ -5,5 +5,5 @@ import ru.an1s9n.oddsgame.player.dto.registration.RegistrationResponseDto
 
 interface RegistrationService {
 
-  suspend fun validateRequestAndRegister(registrationRequestDto: RegistrationRequestDto): RegistrationResponseDto
+  suspend fun register(registrationRequestDto: RegistrationRequestDto): RegistrationResponseDto
 }

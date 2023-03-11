@@ -21,7 +21,7 @@ class DefaultGameService(
 
   private val log = LoggerFactory.getLogger(this.javaClass)
 
-  override suspend fun validateRequestAndPlay(player: Player, playRequestDto: PlayRequestDto): BetDto {
+  override suspend fun play(player: Player, playRequestDto: PlayRequestDto): BetDto {
     log.info("incoming play request: $playRequestDto from player $player")
     validate(player, playRequestDto)
       ?.let { violations -> throw ResponseStatusException(HttpStatus.BAD_REQUEST, violations.joinToString()) }
@@ -30,7 +30,7 @@ class DefaultGameService(
       transactionalProxyHelperGameService.doPlay(player, playRequestDto.betNumber, playRequestDto.betCredits * 100)
         .also { log.info("game successfully played: $it") }
     } catch (e: OptimisticLockingFailureException) {
-      validateRequestAndPlay(playerRepository.findById(player.id!!)!!, playRequestDto)
+      play(playerRepository.findById(player.id!!)!!, playRequestDto)
     }
   }
 
